@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -11,50 +10,6 @@ import (
 
 	"github.com/Jguer/yay/v9/generic"
 )
-
-func show(cmd *exec.Cmd) error {
-	cmd.Stdin, cmd.Stdout, cmd.Stderr = os.Stdin, os.Stdout, os.Stderr
-	err := cmd.Run()
-	if err != nil {
-		return fmt.Errorf("")
-	}
-	return nil
-}
-
-func capture(cmd *exec.Cmd) (string, string, error) {
-	var outbuf, errbuf bytes.Buffer
-
-	cmd.Stdout = &outbuf
-	cmd.Stderr = &errbuf
-	err := cmd.Run()
-	stdout := strings.TrimSpace(outbuf.String())
-	stderr := strings.TrimSpace(errbuf.String())
-
-	return stdout, stderr, err
-}
-
-func sudoLoopBackground() {
-	updateSudo()
-	go sudoLoop()
-}
-
-func sudoLoop() {
-	for {
-		updateSudo()
-		time.Sleep(298 * time.Second)
-	}
-}
-
-func updateSudo() {
-	for {
-		err := show(exec.Command("sudo", "-v"))
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-		} else {
-			break
-		}
-	}
-}
 
 // waitLock will lock yay checking the status of db.lck until it does not exist
 func waitLock() {

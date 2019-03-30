@@ -11,6 +11,7 @@ import (
 
 	"github.com/Jguer/yay/v9/conf"
 	"github.com/Jguer/yay/v9/generic"
+	"github.com/Jguer/yay/v9/generic/exe"
 	gosrc "github.com/Morganamilo/go-srcinfo"
 	alpm "github.com/jguer/go-alpm"
 )
@@ -135,7 +136,7 @@ func install(parser *arguments) error {
 		parser.op = "S"
 		parser.delArg("y", "refresh")
 		parser.options["ignore"] = arguments.options["ignore"]
-		return show(passToPacman(parser))
+		return exe.Show(passToPacman(parser))
 	}
 
 	if len(dp.Aur) > 0 && os.Geteuid() == 0 {
@@ -277,7 +278,7 @@ func install(parser *arguments) error {
 	}
 
 	if len(arguments.targets) > 0 || arguments.existsArg("u") {
-		err := show(passToPacman(arguments))
+		err := exe.Show(passToPacman(arguments))
 		if err != nil {
 			return fmt.Errorf("Error installing repo packages")
 		}
@@ -301,14 +302,14 @@ func install(parser *arguments) error {
 		}
 
 		if len(depArguments.targets) > 0 {
-			_, stderr, err := capture(passToPacman(depArguments))
+			_, stderr, err := exe.Capture(passToPacman(depArguments))
 			if err != nil {
 				return fmt.Errorf("%s%s", stderr, err)
 			}
 		}
 
 		if len(expArguments.targets) > 0 {
-			_, stderr, err := capture(passToPacman(expArguments))
+			_, stderr, err := exe.Capture(passToPacman(expArguments))
 			if err != nil {
 				return fmt.Errorf("%s%s", stderr, err)
 			}
@@ -337,7 +338,7 @@ func install(parser *arguments) error {
 
 		oldValue := config.NoConfirm
 		config.NoConfirm = true
-		err = show(passToPacman(removeArguments))
+		err = exe.Show(passToPacman(removeArguments))
 		config.NoConfirm = oldValue
 
 		if err != nil {
@@ -398,7 +399,7 @@ func earlyPacmanCall(parser *arguments) error {
 	}
 
 	if parser.existsArg("y", "refresh") || parser.existsArg("u", "sysupgrade") || len(arguments.targets) > 0 {
-		err = show(passToPacman(arguments))
+		err = exe.Show(passToPacman(arguments))
 		if err != nil {
 			return fmt.Errorf("Error installing repo packages")
 		}
@@ -415,7 +416,7 @@ func earlyRefresh(parser *arguments) error {
 	arguments.delArg("i", "info")
 	arguments.delArg("l", "list")
 	arguments.clearTargets()
-	return show(passToPacman(arguments))
+	return exe.Show(passToPacman(arguments))
 }
 
 func getIncompatible(bases []Base, srcinfos map[string]*gosrc.Srcinfo) (generic.StringSet, error) {
@@ -456,7 +457,7 @@ nextpkg:
 }
 
 func parsePackageList(dir string) (map[string]string, string, error) {
-	stdout, stderr, err := capture(passToMakepkg(dir, "--packagelist"))
+	stdout, stderr, err := exe.Capture(passToMakepkg(dir, "--packagelist"))
 
 	if err != nil {
 		return nil, "", fmt.Errorf("%s%s", stderr, err)
@@ -709,7 +710,7 @@ func showPkgbuildDiffs(bases []Base, cloned generic.StringSet) error {
 			} else {
 				args = append(args, "--color=never")
 			}
-			err := show(passToGit(dir, args...))
+			err := exe.Show(passToGit(dir, args...))
 			if err != nil {
 				return err
 			}
@@ -722,7 +723,7 @@ func showPkgbuildDiffs(bases []Base, cloned generic.StringSet) error {
 			}
 			args = append(args, "--no-index", "/var/empty", dir)
 			// git always returns 1. why? I have no idea
-			show(passToGit(dir, args...))
+			exe.Show(passToGit(dir, args...))
 		}
 	}
 
@@ -891,7 +892,7 @@ func downloadPkgbuildsSources(bases []Base, incompatible generic.StringSet) (err
 			args = append(args, "--ignorearch")
 		}
 
-		err = show(passToMakepkg(dir, args...))
+		err = exe.Show(passToMakepkg(dir, args...))
 		if err != nil {
 			return fmt.Errorf("Error downloading sources: %s", generic.Cyan(base.String()))
 		}
@@ -915,7 +916,7 @@ func buildInstallPkgbuilds(dp *depPool, do *depOrder, srcinfos map[string]*gosrc
 		}
 
 		//pkgver bump
-		err := show(passToMakepkg(dir, args...))
+		err := exe.Show(passToMakepkg(dir, args...))
 		if err != nil {
 			return fmt.Errorf("Error making: %s", base.String())
 		}
@@ -956,14 +957,14 @@ func buildInstallPkgbuilds(dp *depPool, do *depOrder, srcinfos map[string]*gosrc
 			}
 
 			if installed {
-				show(passToMakepkg(dir, "-c", "--nobuild", "--noextract", "--ignorearch"))
+				exe.Show(passToMakepkg(dir, "-c", "--nobuild", "--noextract", "--ignorearch"))
 				fmt.Println(generic.Cyan(pkg+"-"+version) + generic.Bold(" is up to date -- skipping"))
 				continue
 			}
 		}
 
 		if built {
-			show(passToMakepkg(dir, "-c", "--nobuild", "--noextract", "--ignorearch"))
+			exe.Show(passToMakepkg(dir, "-c", "--nobuild", "--noextract", "--ignorearch"))
 			fmt.Println(generic.Bold(generic.Yellow(generic.Arrow)),
 				generic.Cyan(pkg+"-"+version)+generic.Bold(" already made -- skipping build"))
 		} else {
@@ -973,7 +974,7 @@ func buildInstallPkgbuilds(dp *depPool, do *depOrder, srcinfos map[string]*gosrc
 				args = append(args, "--ignorearch")
 			}
 
-			err := show(passToMakepkg(dir, args...))
+			err := exe.Show(passToMakepkg(dir, args...))
 			if err != nil {
 				return fmt.Errorf("Error making: %s", base.String())
 			}
@@ -1047,7 +1048,7 @@ func buildInstallPkgbuilds(dp *depPool, do *depOrder, srcinfos map[string]*gosrc
 			}
 		}
 
-		err = show(passToPacman(arguments))
+		err = exe.Show(passToPacman(arguments))
 		if err != nil {
 			return err
 		}
@@ -1067,7 +1068,7 @@ func buildInstallPkgbuilds(dp *depPool, do *depOrder, srcinfos map[string]*gosrc
 		}
 
 		if len(depArguments.targets) > 0 {
-			_, stderr, err := capture(passToPacman(depArguments))
+			_, stderr, err := exe.Capture(passToPacman(depArguments))
 			if err != nil {
 				return fmt.Errorf("%s%s", stderr, err)
 			}

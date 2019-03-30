@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/Jguer/yay/v9/generic"
+	"github.com/Jguer/yay/v9/generic/exe"
 )
 
 // GetPkgbuild gets the pkgbuild of the package 'pkg' trying the ABS first and then the AUR trying the ABS first and then the AUR.
@@ -51,7 +52,7 @@ func cleanRemove(pkgNames []string) (err error) {
 	arguments.addArg("R")
 	arguments.addTarget(pkgNames...)
 
-	return show(passToPacman(arguments))
+	return exe.Show(passToPacman(arguments))
 }
 
 func syncClean(parser *arguments) error {
@@ -70,7 +71,7 @@ func syncClean(parser *arguments) error {
 	}
 
 	if mode == modeRepo || mode == modeAny {
-		if err := show(passToPacman(parser)); err != nil {
+		if err := exe.Show(passToPacman(parser)); err != nil {
 			return err
 		}
 	}
@@ -190,7 +191,7 @@ func cleanUntracked() error {
 
 		dir := filepath.Join(config.BuildDir, file.Name())
 		if shouldUseGit(dir) {
-			if err := show(passToGit(dir, "clean", "-fx")); err != nil {
+			if err := exe.Show(passToGit(dir, "clean", "-fx")); err != nil {
 				return err
 			}
 		}
@@ -207,12 +208,12 @@ func cleanAfter(bases []Base) {
 
 		if shouldUseGit(dir) {
 			fmt.Printf(generic.Bold(generic.Cyan("::")+" Cleaning (%d/%d): %s\n"), i+1, len(bases), generic.Cyan(dir))
-			_, stderr, err := capture(passToGit(dir, "reset", "--hard", "HEAD"))
+			_, stderr, err := exe.Capture(passToGit(dir, "reset", "--hard", "HEAD"))
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "error resetting %s: %s", base.String(), stderr)
 			}
 
-			show(passToGit(dir, "clean", "-fx"))
+			exe.Show(passToGit(dir, "clean", "-fx"))
 		} else {
 			fmt.Printf(generic.Bold(generic.Cyan("::")+" Deleting (%d/%d): %s\n"), i+1, len(bases), generic.Cyan(dir))
 			if err := os.RemoveAll(dir); err != nil {

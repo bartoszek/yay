@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Jguer/yay/v9/generic"
+	"github.com/Jguer/yay/v9/generic/exe"
 	alpm "github.com/jguer/go-alpm"
 	rpc "github.com/mikkeloscar/aur"
 )
@@ -231,7 +232,7 @@ func syncInfo(pkgS []string) (err error) {
 		arguments := cmdArgs.copy()
 		arguments.clearTargets()
 		arguments.addTarget(repoS...)
-		err = show(passToPacman(arguments))
+		err = exe.Show(passToPacman(arguments))
 
 		if err != nil {
 			return

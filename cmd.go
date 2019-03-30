@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/Jguer/yay/v9/generic"
+	"github.com/Jguer/yay/v9/generic/exe"
 	alpm "github.com/jguer/go-alpm"
 )
 
@@ -137,16 +138,16 @@ func handleCmd() (err error) {
 	}
 
 	if config.SudoLoop && cmdArgs.needRoot() {
-		sudoLoopBackground()
+		exe.SudoLoopBackground()
 	}
 
 	switch cmdArgs.op {
 	case "V", "version":
 		handleVersion()
 	case "D", "database":
-		err = show(passToPacman(cmdArgs))
+		err = exe.Show(passToPacman(cmdArgs))
 	case "F", "files":
-		err = show(passToPacman(cmdArgs))
+		err = exe.Show(passToPacman(cmdArgs))
 	case "Q", "query":
 		err = handleQuery()
 	case "R", "remove":
@@ -154,9 +155,9 @@ func handleCmd() (err error) {
 	case "S", "sync":
 		err = handleSync()
 	case "T", "deptest":
-		err = show(passToPacman(cmdArgs))
+		err = exe.Show(passToPacman(cmdArgs))
 	case "U", "upgrade":
-		err = show(passToPacman(cmdArgs))
+		err = exe.Show(passToPacman(cmdArgs))
 	case "G", "getpkgbuild":
 		err = handleGetpkgbuild()
 	case "P", "show":
@@ -176,7 +177,7 @@ func handleQuery() error {
 	if cmdArgs.existsArg("u", "upgrades") {
 		return printUpdateList(cmdArgs)
 	}
-	return show(passToPacman(cmdArgs))
+	return exe.Show(passToPacman(cmdArgs))
 }
 
 func handleHelp() error {
@@ -184,7 +185,7 @@ func handleHelp() error {
 		usage()
 		return nil
 	}
-	return show(passToPacman(cmdArgs))
+	return exe.Show(passToPacman(cmdArgs))
 }
 
 func handleVersion() {
@@ -255,7 +256,7 @@ func handleSync() error {
 		return syncSearch(targets)
 	}
 	if cmdArgs.existsArg("p", "print", "print-format") {
-		return show(passToPacman(cmdArgs))
+		return exe.Show(passToPacman(cmdArgs))
 	}
 	if cmdArgs.existsArg("c", "clean") {
 		return syncClean(cmdArgs)
@@ -264,7 +265,7 @@ func handleSync() error {
 		return syncList(cmdArgs)
 	}
 	if cmdArgs.existsArg("g", "groups") {
-		return show(passToPacman(cmdArgs))
+		return exe.Show(passToPacman(cmdArgs))
 	}
 	if cmdArgs.existsArg("i", "info") {
 		return syncInfo(targets)
@@ -276,14 +277,14 @@ func handleSync() error {
 		return install(cmdArgs)
 	}
 	if cmdArgs.existsArg("y", "refresh") {
-		return show(passToPacman(cmdArgs))
+		return exe.Show(passToPacman(cmdArgs))
 	}
 	return nil
 }
 
 func handleRemove() error {
 	removeVCSPackage(cmdArgs.targets)
-	return show(passToPacman(cmdArgs))
+	return exe.Show(passToPacman(cmdArgs))
 }
 
 // NumberMenu presents a CLI for selecting packages to install.
@@ -380,7 +381,7 @@ func displayNumberMenu(pkgS []string) (err error) {
 	}
 
 	if config.SudoLoop {
-		sudoLoopBackground()
+		exe.SudoLoopBackground()
 	}
 
 	err = install(arguments)
@@ -430,7 +431,7 @@ func syncList(parser *arguments) error {
 	}
 
 	if (mode == modeAny || mode == modeRepo) && (len(parser.targets) != 0 || !aur) {
-		return show(passToPacman(parser))
+		return exe.Show(passToPacman(parser))
 	}
 
 	return nil

@@ -11,6 +11,7 @@ import (
 	"sync"
 
 	"github.com/Jguer/yay/v9/generic"
+	"github.com/Jguer/yay/v9/generic/exe"
 	alpm "github.com/jguer/go-alpm"
 )
 
@@ -49,7 +50,7 @@ func downloadFile(path string, url string) (err error) {
 }
 
 func gitHasDiff(path string, name string) (bool, error) {
-	stdout, stderr, err := capture(passToGit(filepath.Join(path, name), "rev-parse", "HEAD", "HEAD@{upstream}"))
+	stdout, stderr, err := exe.Capture(passToGit(filepath.Join(path, name), "rev-parse", "HEAD", "HEAD@{upstream}"))
 	if err != nil {
 		return false, fmt.Errorf("%s%s", stderr, err)
 	}
@@ -66,7 +67,7 @@ func gitDownload(url string, path string, name string) (bool, error) {
 	if os.IsNotExist(err) {
 		cmd := passToGit(path, "clone", "--no-progress", url, name)
 		cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=0")
-		_, stderr, err := capture(cmd)
+		_, stderr, err := exe.Capture(cmd)
 		if err != nil {
 			return false, fmt.Errorf("error cloning %s: %s", name, stderr)
 		}
@@ -78,7 +79,7 @@ func gitDownload(url string, path string, name string) (bool, error) {
 
 	cmd := passToGit(filepath.Join(path, name), "fetch")
 	cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=0")
-	_, stderr, err := capture(cmd)
+	_, stderr, err := exe.Capture(cmd)
 	if err != nil {
 		return false, fmt.Errorf("error fetching %s: %s", name, stderr)
 	}
@@ -87,12 +88,12 @@ func gitDownload(url string, path string, name string) (bool, error) {
 }
 
 func gitMerge(path string, name string) error {
-	_, stderr, err := capture(passToGit(filepath.Join(path, name), "reset", "--hard", "HEAD"))
+	_, stderr, err := exe.Capture(passToGit(filepath.Join(path, name), "reset", "--hard", "HEAD"))
 	if err != nil {
 		return fmt.Errorf("error resetting %s: %s", name, stderr)
 	}
 
-	_, stderr, err = capture(passToGit(filepath.Join(path, name), "merge", "--no-edit", "--ff"))
+	_, stderr, err = exe.Capture(passToGit(filepath.Join(path, name), "merge", "--no-edit", "--ff"))
 	if err != nil {
 		return fmt.Errorf("error merging %s: %s", name, stderr)
 	}
@@ -101,7 +102,7 @@ func gitMerge(path string, name string) error {
 }
 
 func gitDiff(path string, name string) error {
-	err := show(passToGit(filepath.Join(path, name), "diff", "HEAD..HEAD@{upstream}"))
+	err := exe.Show(passToGit(filepath.Join(path, name), "diff", "HEAD..HEAD@{upstream}"))
 
 	return err
 }
@@ -123,7 +124,7 @@ func downloadAndUnpack(url string, path string) error {
 		return err
 	}
 
-	_, stderr, err := capture(exec.Command(config.TarBin, "-xf", tarLocation, "-C", path))
+	_, stderr, err := exe.Capture(exec.Command(config.TarBin, "-xf", tarLocation, "-C", path))
 	if err != nil {
 		return fmt.Errorf("%s", stderr)
 	}
@@ -278,7 +279,7 @@ func getPkgbuildsfromABS(pkgs []string, path string) (bool, error) {
 			return
 		}
 
-		_, stderr, err := capture(exec.Command("mv", filepath.Join(cacheHome, "packages", pkg, "trunk"), filepath.Join(path, pkg)))
+		_, stderr, err := exe.Capture(exec.Command("mv", filepath.Join(cacheHome, "packages", pkg, "trunk"), filepath.Join(path, pkg)))
 		mux.Lock()
 		downloaded++
 		if err != nil {
