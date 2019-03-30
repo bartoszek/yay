@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/Jguer/yay/v9/conf"
 	"github.com/Jguer/yay/v9/generic"
 	gosrc "github.com/Morganamilo/go-srcinfo"
 	alpm "github.com/jguer/go-alpm"
@@ -138,7 +139,7 @@ func install(parser *arguments) error {
 	}
 
 	if len(dp.Aur) > 0 && os.Geteuid() == 0 {
-		return fmt.Errorf(bold(red(arrow)) + " Refusing to install AUR Packages as root, Aborting.")
+		return fmt.Errorf(generic.Bold(generic.Red(generic.Arrow)) + " Refusing to install AUR Packages as root, Aborting.")
 	}
 
 	conflicts, err := dp.CheckConflicts()
@@ -218,7 +219,7 @@ func install(parser *arguments) error {
 		oldValue := config.NoConfirm
 		config.NoConfirm = false
 		fmt.Println()
-		if !continueTask(bold(green("Proceed with install?")), true) {
+		if !continueTask(generic.Bold(generic.Green("Proceed with install?")), true) {
 			return fmt.Errorf("Aborting due to user")
 		}
 		config.NoConfirm = oldValue
@@ -253,7 +254,7 @@ func install(parser *arguments) error {
 		oldValue := config.NoConfirm
 		config.NoConfirm = false
 		fmt.Println()
-		if !continueTask(bold(green("Proceed with install?")), true) {
+		if !continueTask(generic.Bold(generic.Green("Proceed with install?")), true) {
 			return fmt.Errorf("Aborting due to user")
 		}
 		config.NoConfirm = oldValue
@@ -439,9 +440,9 @@ nextpkg:
 
 	if len(incompatible) > 0 {
 		fmt.Println()
-		fmt.Print(bold(yellow(arrow)) + " The following packages are not compatible with your architecture:")
+		fmt.Print(generic.Bold(generic.Yellow(generic.Arrow)) + " The following packages are not compatible with your architecture:")
 		for pkg := range incompatible {
-			fmt.Print("  " + cyan(basesMap[pkg].String()))
+			fmt.Print("  " + generic.Cyan(basesMap[pkg].String()))
 		}
 
 		fmt.Println()
@@ -509,8 +510,8 @@ func pkgbuildNumberMenu(bases []Base, installed generic.StringSet) bool {
 		pkg := base.Pkgbase()
 		dir := filepath.Join(config.BuildDir, pkg)
 
-		toPrint += fmt.Sprintf(magenta("%3d")+" %-40s", len(bases)-n,
-			bold(base.String()))
+		toPrint += fmt.Sprintf(generic.Magenta("%3d")+" %-40s", len(bases)-n,
+			generic.Bold(base.String()))
 
 		anyInstalled := false
 		for _, b := range base {
@@ -518,11 +519,11 @@ func pkgbuildNumberMenu(bases []Base, installed generic.StringSet) bool {
 		}
 
 		if anyInstalled {
-			toPrint += bold(green(" (Installed)"))
+			toPrint += generic.Bold(generic.Green(" (Installed)"))
 		}
 
 		if _, err := os.Stat(dir); !os.IsNotExist(err) {
-			toPrint += bold(green(" (Build Files Exist)"))
+			toPrint += generic.Bold(generic.Green(" (Build Files Exist)"))
 			askClean = true
 		}
 
@@ -541,9 +542,9 @@ func cleanNumberMenu(bases []Base, installed generic.StringSet, hasClean bool) (
 		return toClean, nil
 	}
 
-	fmt.Println(bold(green(arrow + " Packages to cleanBuild?")))
-	fmt.Println(bold(green(arrow) + cyan(" [N]one ") + "[A]ll [Ab]ort [I]nstalled [No]tInstalled or (1 2 3, 1-3, ^4)"))
-	fmt.Print(bold(green(arrow + " ")))
+	fmt.Println(generic.Bold(generic.Green(generic.Arrow + " Packages to cleanBuild?")))
+	fmt.Println(generic.Bold(generic.Green(generic.Arrow) + generic.Cyan(" [N]one ") + "[A]ll [Ab]ort [I]nstalled [No]tInstalled or (1 2 3, 1-3, ^4)"))
+	fmt.Print(generic.Bold(generic.Green(generic.Arrow + " ")))
 	cleanInput, err := getInput(config.AnswerClean)
 	if err != nil {
 		return nil, err
@@ -617,17 +618,17 @@ func editDiffNumberMenu(bases []Base, installed generic.StringSet, diff bool) ([
 	var err error
 
 	if diff {
-		fmt.Println(bold(green(arrow + " Diffs to show?")))
-		fmt.Println(bold(green(arrow) + cyan(" [N]one ") + "[A]ll [Ab]ort [I]nstalled [No]tInstalled or (1 2 3, 1-3, ^4)"))
-		fmt.Print(bold(green(arrow + " ")))
+		fmt.Println(generic.Bold(generic.Green(generic.Arrow + " Diffs to show?")))
+		fmt.Println(generic.Bold(generic.Green(generic.Arrow) + generic.Cyan(" [N]one ") + "[A]ll [Ab]ort [I]nstalled [No]tInstalled or (1 2 3, 1-3, ^4)"))
+		fmt.Print(generic.Bold(generic.Green(generic.Arrow + " ")))
 		editInput, err = getInput(config.AnswerDiff)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		fmt.Println(bold(green(arrow + " PKGBUILDs to edit?")))
-		fmt.Println(bold(green(arrow) + cyan(" [N]one ") + "[A]ll [Ab]ort [I]nstalled [No]tInstalled or (1 2 3, 1-3, ^4)"))
-		fmt.Print(bold(green(arrow + " ")))
+		fmt.Println(generic.Bold(generic.Green(generic.Arrow + " PKGBUILDs to edit?")))
+		fmt.Println(generic.Bold(generic.Green(generic.Arrow) + generic.Cyan(" [N]one ") + "[A]ll [Ab]ort [I]nstalled [No]tInstalled or (1 2 3, 1-3, ^4)"))
+		fmt.Print(generic.Bold(generic.Green(generic.Arrow + " ")))
 		editInput, err = getInput(config.AnswerEdit)
 		if err != nil {
 			return nil, err
@@ -697,13 +698,13 @@ func showPkgbuildDiffs(bases []Base, cloned generic.StringSet) error {
 				}
 
 				if !hasDiff {
-					fmt.Printf("%s %s: %s\n", bold(yellow(arrow)), cyan(base.String()), bold("No changes -- skipping"))
+					fmt.Printf("%s %s: %s\n", generic.Bold(generic.Yellow(generic.Arrow)), generic.Cyan(base.String()), generic.Bold("No changes -- skipping"))
 					continue
 				}
 			}
 
 			args := []string{"diff", start + "..HEAD@{upstream}", "--src-prefix", dir + "/", "--dst-prefix", dir + "/", "--", ".", ":(exclude).SRCINFO"}
-			if useColor {
+			if conf.UseColor {
 				args = append(args, "--color=always")
 			} else {
 				args = append(args, "--color=never")
@@ -714,7 +715,7 @@ func showPkgbuildDiffs(bases []Base, cloned generic.StringSet) error {
 			}
 		} else {
 			args := []string{"diff"}
-			if useColor {
+			if conf.UseColor {
 				args = append(args, "--color=always")
 			} else {
 				args = append(args, "--color=never")
@@ -762,8 +763,8 @@ func parseSrcinfoFiles(bases []Base, errIsFatal bool) (map[string]*gosrc.Srcinfo
 		pkg := base.Pkgbase()
 		dir := filepath.Join(config.BuildDir, pkg)
 
-		str := bold(cyan("::") + " Parsing SRCINFO (%d/%d): %s\n")
-		fmt.Printf(str, k+1, len(bases), cyan(base.String()))
+		str := generic.Bold(generic.Cyan("::") + " Parsing SRCINFO (%d/%d): %s\n")
+		fmt.Printf(str, k+1, len(bases), generic.Cyan(base.String()))
 
 		pkgbuild, err := gosrc.ParseFile(filepath.Join(dir, ".SRCINFO"))
 		if err != nil {
@@ -833,8 +834,8 @@ func downloadPkgbuilds(bases []Base, toSkip generic.StringSet, buildDir string) 
 		if toSkip.Get(pkg) {
 			mux.Lock()
 			downloaded++
-			str := bold(cyan("::") + " PKGBUILD up to date, Skipping (%d/%d): %s\n")
-			fmt.Printf(str, downloaded, len(bases), cyan(base.String()))
+			str := generic.Bold(generic.Cyan("::") + " PKGBUILD up to date, Skipping (%d/%d): %s\n")
+			fmt.Printf(str, downloaded, len(bases), generic.Cyan(base.String()))
 			mux.Unlock()
 			return
 		}
@@ -860,8 +861,8 @@ func downloadPkgbuilds(bases []Base, toSkip generic.StringSet, buildDir string) 
 
 		mux.Lock()
 		downloaded++
-		str := bold(cyan("::") + " Downloaded PKGBUILD (%d/%d): %s\n")
-		fmt.Printf(str, downloaded, len(bases), cyan(base.String()))
+		str := generic.Bold(generic.Cyan("::") + " Downloaded PKGBUILD (%d/%d): %s\n")
+		fmt.Printf(str, downloaded, len(bases), generic.Cyan(base.String()))
 		mux.Unlock()
 	}
 
@@ -892,7 +893,7 @@ func downloadPkgbuildsSources(bases []Base, incompatible generic.StringSet) (err
 
 		err = show(passToMakepkg(dir, args...))
 		if err != nil {
-			return fmt.Errorf("Error downloading sources: %s", cyan(base.String()))
+			return fmt.Errorf("Error downloading sources: %s", generic.Cyan(base.String()))
 		}
 	}
 
@@ -956,15 +957,15 @@ func buildInstallPkgbuilds(dp *depPool, do *depOrder, srcinfos map[string]*gosrc
 
 			if installed {
 				show(passToMakepkg(dir, "-c", "--nobuild", "--noextract", "--ignorearch"))
-				fmt.Println(cyan(pkg+"-"+version) + bold(" is up to date -- skipping"))
+				fmt.Println(generic.Cyan(pkg+"-"+version) + generic.Bold(" is up to date -- skipping"))
 				continue
 			}
 		}
 
 		if built {
 			show(passToMakepkg(dir, "-c", "--nobuild", "--noextract", "--ignorearch"))
-			fmt.Println(bold(yellow(arrow)),
-				cyan(pkg+"-"+version)+bold(" already made -- skipping build"))
+			fmt.Println(generic.Bold(generic.Yellow(generic.Arrow)),
+				generic.Cyan(pkg+"-"+version)+generic.Bold(" already made -- skipping build"))
 		} else {
 			args := []string{"-cf", "--noconfirm", "--noextract", "--noprepare", "--holdver"}
 

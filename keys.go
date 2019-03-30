@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/Jguer/yay/v9/generic"
 	gosrc "github.com/Morganamilo/go-srcinfo"
 )
 
@@ -77,7 +78,7 @@ func checkPgpKeys(bases []Base, srcinfos map[string]*gosrc.Srcinfo) error {
 	fmt.Println()
 	fmt.Println(str)
 
-	if continueTask(bold(green("Import?")), true) {
+	if continueTask(generic.Bold(generic.Green("Import?")), true) {
 		return importKeys(problematic.toSlice())
 	}
 
@@ -90,11 +91,11 @@ func importKeys(keys []string) error {
 	cmd := exec.Command(config.GpgBin, append(args, keys...)...)
 	cmd.Stdin, cmd.Stdout, cmd.Stderr = os.Stdin, os.Stdout, os.Stderr
 
-	fmt.Printf("%s %s...\n", bold(cyan("::")), bold("Importing keys with gpg..."))
+	fmt.Printf("%s %s...\n", generic.Bold(generic.Cyan("::")), generic.Bold("Importing keys with gpg..."))
 	err := cmd.Run()
 
 	if err != nil {
-		return fmt.Errorf("%s Problem importing keys", bold(red(arrow+" Error:")))
+		return fmt.Errorf("%s Problem importing keys", generic.Bold(generic.Red(generic.Arrow+" Error:")))
 	}
 	return nil
 }
@@ -103,19 +104,19 @@ func importKeys(keys []string) error {
 // question asking the user wants to import the problematic keys.
 func formatKeysToImport(keys pgpKeySet) (string, error) {
 	if len(keys) == 0 {
-		return "", fmt.Errorf("%s No keys to import", bold(red(arrow+" Error:")))
+		return "", fmt.Errorf("%s No keys to import", generic.Bold(generic.Red(generic.Arrow+" Error:")))
 	}
 
 	var buffer bytes.Buffer
-	buffer.WriteString(bold(green(arrow)))
-	buffer.WriteString(bold(green(" PGP keys need importing:")))
+	buffer.WriteString(generic.Bold(generic.Green(generic.Arrow)))
+	buffer.WriteString(generic.Bold(generic.Green(" PGP keys need importing:")))
 	for key, bases := range keys {
 		pkglist := ""
 		for _, base := range bases {
 			pkglist += base.String() + "  "
 		}
 		pkglist = strings.TrimRight(pkglist, "  ")
-		buffer.WriteString(fmt.Sprintf("\n%s %s, required by: %s", yellow(bold(smallArrow)), cyan(key), cyan(pkglist)))
+		buffer.WriteString(fmt.Sprintf("\n%s %s, required by: %s", generic.Yellow(generic.Bold(generic.SmallArrow)), generic.Cyan(key), generic.Cyan(pkglist)))
 	}
 	return buffer.String(), nil
 }

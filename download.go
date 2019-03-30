@@ -167,15 +167,15 @@ func getPkgbuilds(pkgs []string) error {
 			_, err = os.Stat(filepath.Join(wd, name))
 			switch {
 			case err != nil && !os.IsNotExist(err):
-				fmt.Fprintln(os.Stderr, bold(red(smallArrow)), err)
+				fmt.Fprintln(os.Stderr, generic.Bold(generic.Red(generic.SmallArrow)), err)
 				continue
 			case os.IsNotExist(err), cmdArgs.existsArg("f", "force"), shouldUseGit(filepath.Join(wd, name)):
 				if err = os.RemoveAll(filepath.Join(wd, name)); err != nil {
-					fmt.Fprintln(os.Stderr, bold(red(smallArrow)), err)
+					fmt.Fprintln(os.Stderr, generic.Bold(generic.Red(generic.SmallArrow)), err)
 					continue
 				}
 			default:
-				fmt.Printf("%s %s %s\n", yellow(smallArrow), cyan(name), "already downloaded -- use -f to overwrite")
+				fmt.Printf("%s %s %s\n", generic.Yellow(generic.SmallArrow), generic.Cyan(name), "already downloaded -- use -f to overwrite")
 				continue
 			}
 
@@ -252,15 +252,15 @@ func getPkgbuildsfromABS(pkgs []string, path string) (bool, error) {
 		_, err = os.Stat(filepath.Join(path, name))
 		switch {
 		case err != nil && !os.IsNotExist(err):
-			fmt.Fprintln(os.Stderr, bold(red(smallArrow)), err)
+			fmt.Fprintln(os.Stderr, generic.Bold(generic.Red(generic.SmallArrow)), err)
 			continue
 		case os.IsNotExist(err), cmdArgs.existsArg("f", "force"):
 			if err = os.RemoveAll(filepath.Join(path, name)); err != nil {
-				fmt.Fprintln(os.Stderr, bold(red(smallArrow)), err)
+				fmt.Fprintln(os.Stderr, generic.Bold(generic.Red(generic.SmallArrow)), err)
 				continue
 			}
 		default:
-			fmt.Printf("%s %s %s\n", yellow(smallArrow), cyan(name), "already downloaded -- use -f to overwrite")
+			fmt.Printf("%s %s %s\n", generic.Yellow(generic.SmallArrow), generic.Cyan(name), "already downloaded -- use -f to overwrite")
 			continue
 		}
 
@@ -268,13 +268,13 @@ func getPkgbuildsfromABS(pkgs []string, path string) (bool, error) {
 	}
 
 	if len(missing) != 0 {
-		fmt.Println(yellow(bold(smallArrow)), "Missing ABS packages: ", cyan(strings.Join(missing, "  ")))
+		fmt.Println(generic.Yellow(generic.Bold(generic.SmallArrow)), "Missing ABS packages: ", generic.Cyan(strings.Join(missing, "  ")))
 	}
 
 	download := func(pkg string, url string) {
 		defer wg.Done()
 		if err := downloadAndUnpack(url, cacheHome); err != nil {
-			errs.Add(fmt.Errorf("%s Failed to get pkgbuild: %s: %s", bold(red(arrow)), bold(cyan(pkg)), bold(red(err.Error()))))
+			errs.Add(fmt.Errorf("%s Failed to get pkgbuild: %s: %s", generic.Bold(generic.Red(generic.Arrow)), generic.Bold(generic.Cyan(pkg)), generic.Bold(generic.Red(err.Error()))))
 			return
 		}
 
@@ -282,9 +282,9 @@ func getPkgbuildsfromABS(pkgs []string, path string) (bool, error) {
 		mux.Lock()
 		downloaded++
 		if err != nil {
-			errs.Add(fmt.Errorf("%s Failed to move %s: %s", bold(red(arrow)), bold(cyan(pkg)), bold(red(string(stderr)))))
+			errs.Add(fmt.Errorf("%s Failed to move %s: %s", generic.Bold(generic.Red(generic.Arrow)), generic.Bold(generic.Cyan(pkg)), generic.Bold(generic.Red(string(stderr)))))
 		} else {
-			fmt.Printf(bold(cyan("::"))+" Downloaded PKGBUILD from ABS (%d/%d): %s\n", downloaded, len(names), cyan(pkg))
+			fmt.Printf(generic.Bold(generic.Cyan("::"))+" Downloaded PKGBUILD from ABS (%d/%d): %s\n", downloaded, len(names), generic.Cyan(pkg))
 		}
 		mux.Unlock()
 	}

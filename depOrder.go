@@ -71,12 +71,12 @@ func removeInvalidTargets(targets []string) []string {
 		db, _ := splitDBFromName(target)
 
 		if db == "aur" && mode == modeRepo {
-			fmt.Printf("%s %s %s\n", bold(yellow(arrow)), cyan(target), bold("Can't use target with option --repo -- skipping"))
+			fmt.Printf("%s %s %s\n", generic.Bold(generic.Yellow(generic.Arrow)), generic.Cyan(target), generic.Bold("Can't use target with option --repo -- skipping"))
 			continue
 		}
 
 		if db != "aur" && db != "" && mode == modeAUR {
-			fmt.Printf("%s %s %s\n", bold(yellow(arrow)), cyan(target), bold("Can't use target with option --aur -- skipping"))
+			fmt.Printf("%s %s %s\n", generic.Bold(generic.Yellow(generic.Arrow)), generic.Cyan(target), generic.Bold("Can't use target with option --aur -- skipping"))
 			continue
 		}
 

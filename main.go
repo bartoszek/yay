@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/Jguer/yay/v9/conf"
 	pacmanconf "github.com/Morganamilo/go-pacmanconf"
 	alpm "github.com/jguer/go-alpm"
 )
@@ -148,13 +149,13 @@ func initAlpm() error {
 
 	switch value, _, _ := cmdArgs.getArg("color"); value {
 	case "always":
-		useColor = true
+		conf.UseColor = true
 	case "auto":
-		useColor = isTty()
+		conf.UseColor = isTty()
 	case "never":
-		useColor = false
+		conf.UseColor = false
 	default:
-		useColor = pacmanConf.Color && isTty()
+		conf.UseColor = pacmanConf.Color && isTty()
 	}
 
 	return nil

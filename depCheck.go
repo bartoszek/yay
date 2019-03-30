@@ -131,14 +131,14 @@ func (dp *depPool) CheckConflicts() (generic.MapStringSet, error) {
 	conflicts := make(generic.MapStringSet)
 	wg.Add(2)
 
-	fmt.Println(bold(cyan("::") + bold(" Checking for conflicts...")))
+	fmt.Println(generic.Bold(generic.Cyan("::") + generic.Bold(" Checking for conflicts...")))
 	go func() {
 		dp.checkForwardConflicts(conflicts)
 		dp.checkReverseConflicts(conflicts)
 		wg.Done()
 	}()
 
-	fmt.Println(bold(cyan("::") + bold(" Checking for inner conflicts...")))
+	fmt.Println(generic.Bold(generic.Cyan("::") + generic.Bold(" Checking for inner conflicts...")))
 	go func() {
 		dp.checkInnerConflicts(innerConflicts)
 		wg.Done()
@@ -148,12 +148,12 @@ func (dp *depPool) CheckConflicts() (generic.MapStringSet, error) {
 
 	if len(innerConflicts) != 0 {
 		fmt.Println()
-		fmt.Println(bold(red(arrow)), bold("Inner conflicts found:"))
+		fmt.Println(generic.Bold(generic.Red(generic.Arrow)), generic.Bold("Inner conflicts found:"))
 
 		for name, pkgs := range innerConflicts {
-			str := red(bold(smallArrow)) + " " + name + ":"
+			str := generic.Red(generic.Bold(generic.SmallArrow)) + " " + name + ":"
 			for pkg := range pkgs {
-				str += " " + cyan(pkg) + ","
+				str += " " + generic.Cyan(pkg) + ","
 			}
 			str = strings.TrimSuffix(str, ",")
 
@@ -164,12 +164,12 @@ func (dp *depPool) CheckConflicts() (generic.MapStringSet, error) {
 
 	if len(conflicts) != 0 {
 		fmt.Println()
-		fmt.Println(bold(red(arrow)), bold("Package conflicts found:"))
+		fmt.Println(generic.Bold(generic.Red(generic.Arrow)), generic.Bold("Package conflicts found:"))
 
 		for name, pkgs := range conflicts {
-			str := red(bold(smallArrow)) + " Installing " + cyan(name) + " will remove:"
+			str := generic.Red(generic.Bold(generic.SmallArrow)) + " Installing " + generic.Cyan(name) + " will remove:"
 			for pkg := range pkgs {
-				str += " " + cyan(pkg) + ","
+				str += " " + generic.Cyan(pkg) + ","
 			}
 			str = strings.TrimSuffix(str, ",")
 
@@ -195,7 +195,7 @@ func (dp *depPool) CheckConflicts() (generic.MapStringSet, error) {
 			}
 
 			fmt.Fprintln(os.Stderr)
-			fmt.Fprintln(os.Stderr, bold(red(arrow)), bold("Conflicting packages will have to be confirmed manually"))
+			fmt.Fprintln(os.Stderr, generic.Bold(generic.Red(generic.Arrow)), generic.Bold("Conflicting packages will have to be confirmed manually"))
 			fmt.Fprintln(os.Stderr)
 		}
 	}
@@ -273,20 +273,20 @@ func (dp *depPool) CheckMissing() error {
 		return nil
 	}
 
-	fmt.Println(bold(red(arrow+" Error: ")) + "Could not find all required packages:")
+	fmt.Println(generic.Bold(generic.Red(generic.Arrow+" Error: ")) + "Could not find all required packages:")
 	for dep, trees := range missing.Missing {
 		for _, tree := range trees {
 
-			fmt.Print("    ", cyan(dep))
+			fmt.Print("    ", generic.Cyan(dep))
 
 			if len(tree) == 0 {
 				fmt.Print(" (Target")
 			} else {
 				fmt.Print(" (Wanted by: ")
 				for n := 0; n < len(tree)-1; n++ {
-					fmt.Print(cyan(tree[n]), " -> ")
+					fmt.Print(generic.Cyan(tree[n]), " -> ")
 				}
-				fmt.Print(cyan(tree[len(tree)-1]))
+				fmt.Print(generic.Cyan(tree[len(tree)-1]))
 			}
 
 			fmt.Println(")")

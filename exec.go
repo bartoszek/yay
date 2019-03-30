@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/Jguer/yay/v9/generic"
 )
 
 func show(cmd *exec.Cmd) error {
@@ -60,9 +62,9 @@ func waitLock() {
 		return
 	}
 
-	fmt.Println(bold(yellow(smallArrow)), filepath.Join(pacmanConf.DBPath, "db.lck"), "is present.")
+	fmt.Println(generic.Bold(generic.Yellow(generic.SmallArrow)), filepath.Join(pacmanConf.DBPath, "db.lck"), "is present.")
 
-	fmt.Print(bold(yellow(smallArrow)), " There may be another Pacman instance running. Waiting...")
+	fmt.Print(generic.Bold(generic.Yellow(generic.SmallArrow)), " There may be another Pacman instance running. Waiting...")
 
 	for {
 		time.Sleep(3 * time.Second)

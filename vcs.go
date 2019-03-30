@@ -50,7 +50,7 @@ func createDevelDB() error {
 	}
 
 	wg.Wait()
-	fmt.Println(bold(yellow(arrow) + bold(" GenDB finished. No packages were installed")))
+	fmt.Println(generic.Bold(generic.Yellow(generic.Arrow) + generic.Bold(" GenDB finished. No packages were installed")))
 	return err
 }
 
@@ -133,7 +133,7 @@ func updateVCSData(pkgName string, sources []gosrc.ArchString, mux *sync.Mutex, 
 		}
 
 		savedInfo[pkgName] = info
-		fmt.Println(bold(yellow(arrow)) + " Found git repo: " + cyan(url))
+		fmt.Println(generic.Bold(generic.Yellow(generic.Arrow)) + " Found git repo: " + generic.Cyan(url))
 		saveVCSInfo()
 		mux.Unlock()
 	}

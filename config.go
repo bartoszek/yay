@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/Jguer/yay/v9/generic"
 	pacmanconf "github.com/Morganamilo/go-pacmanconf"
 	alpm "github.com/jguer/go-alpm"
 )
@@ -85,9 +86,6 @@ const configFileName string = "config.json"
 
 // vcsFileName holds the name of the vcs file.
 const vcsFileName string = "vcs.json"
-
-// useColor enables/disables colored printing
-var useColor bool
 
 // configHome handles config directory home
 var configHome string
@@ -243,11 +241,11 @@ func editor() (string, []string) {
 		fallthrough
 	default:
 		fmt.Fprintln(os.Stderr)
-		fmt.Fprintln(os.Stderr, bold(red(arrow)), bold(cyan("$EDITOR")), bold("is not set"))
-		fmt.Fprintln(os.Stderr, bold(red(arrow))+bold(" Please add ")+bold(cyan("$EDITOR"))+bold(" or ")+bold(cyan("$VISUAL"))+bold(" to your environment variables."))
+		fmt.Fprintln(os.Stderr, generic.Bold(generic.Red(generic.Arrow)), generic.Bold(generic.Cyan("$EDITOR")), generic.Bold("is not set"))
+		fmt.Fprintln(os.Stderr, generic.Bold(generic.Red(generic.Arrow))+generic.Bold(" Please add ")+generic.Bold(generic.Cyan("$EDITOR"))+generic.Bold(" or ")+generic.Bold(generic.Cyan("$VISUAL"))+generic.Bold(" to your environment variables."))
 
 		for {
-			fmt.Print(green(bold(arrow + " Edit PKGBUILD with: ")))
+			fmt.Print(generic.Green(generic.Bold(generic.Arrow + " Edit PKGBUILD with: ")))
 			editorInput, err := getInput("")
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
@@ -286,7 +284,7 @@ func continueTask(s string, cont bool) bool {
 		postFix = fmt.Sprintf(" [%s/%s] ", y, strings.ToUpper(n))
 	}
 
-	fmt.Print(bold(green(arrow)+" "+s), bold(postFix))
+	fmt.Print(generic.Bold(generic.Green(generic.Arrow)+" "+s), generic.Bold(postFix))
 
 	if _, err := fmt.Scanln(&response); err != nil {
 		return cont

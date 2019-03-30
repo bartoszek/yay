@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/Jguer/yay/v9/generic"
 	alpm "github.com/jguer/go-alpm"
 )
 
@@ -30,8 +31,8 @@ func questionCallback(question alpm.QuestionAny) {
 		return nil
 	})
 
-	fmt.Print(bold(cyan(":: ")))
-	str := bold(fmt.Sprintf(bold("There are %d providers available for %s:"), size, qp.Dep()))
+	fmt.Print(generic.Bold(generic.Cyan(":: ")))
+	str := generic.Bold(fmt.Sprintf(generic.Bold("There are %d providers available for %s:"), size, qp.Dep()))
 
 	size = 1
 	var db string
@@ -41,7 +42,7 @@ func questionCallback(question alpm.QuestionAny) {
 
 		if db != thisDB {
 			db = thisDB
-			str += bold(cyan("\n:: ")) + bold("Repository "+db+"\n    ")
+			str += generic.Bold(generic.Cyan("\n:: ")) + generic.Bold("Repository "+db+"\n    ")
 		}
 		str += fmt.Sprintf("%d) %s ", size, pkg.Name())
 		size++
@@ -77,12 +78,12 @@ func questionCallback(question alpm.QuestionAny) {
 
 		num, err := strconv.Atoi(string(numberBuf))
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%s invalid number: %s\n", red("error:"), string(numberBuf))
+			fmt.Fprintf(os.Stderr, "%s invalid number: %s\n", generic.Red("error:"), string(numberBuf))
 			continue
 		}
 
 		if num < 1 || num > size {
-			fmt.Fprintf(os.Stderr, "%s invalid value: %d is not between %d and %d\n", red("error:"), num, 1, size)
+			fmt.Fprintf(os.Stderr, "%s invalid value: %d is not between %d and %d\n", generic.Red("error:"), num, 1, size)
 			continue
 		}
 
@@ -94,8 +95,8 @@ func questionCallback(question alpm.QuestionAny) {
 func logCallback(level alpm.LogLevel, str string) {
 	switch level {
 	case alpm.LogWarning:
-		fmt.Print(bold(yellow(smallArrow)), " ", str)
+		fmt.Print(generic.Bold(generic.Yellow(generic.SmallArrow)), " ", str)
 	case alpm.LogError:
-		fmt.Print(bold(red(smallArrow)), " ", str)
+		fmt.Print(generic.Bold(generic.Red(generic.SmallArrow)), " ", str)
 	}
 }

@@ -909,9 +909,9 @@ func parseNews(str string) string {
 				inTag = false
 				switch tagBuffer.String() {
 				case "code":
-					buffer.WriteString(cyanCode)
+					buffer.WriteString(generic.CyanCode)
 				case "/code":
-					buffer.WriteString(resetCode)
+					buffer.WriteString(generic.ResetCode)
 				case "/p":
 					buffer.WriteRune('\n')
 				}
@@ -952,6 +952,6 @@ func parseNews(str string) string {
 		buffer.WriteRune(char)
 	}
 
-	buffer.WriteString(resetCode)
+	buffer.WriteString(generic.ResetCode)
 	return buffer.String()
 }

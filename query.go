@@ -530,7 +530,7 @@ func aurInfo(names []string, warnings *aurWarnings) ([]*rpc.Pkg, error) {
 }
 
 func aurInfoPrint(names []string) ([]*rpc.Pkg, error) {
-	fmt.Println(bold(cyan("::") + bold(" Querying AUR...")))
+	fmt.Println(generic.Bold(generic.Cyan("::") + generic.Bold(" Querying AUR...")))
 
 	warnings := &aurWarnings{}
 	info, err := aurInfo(names, warnings)

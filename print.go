@@ -16,47 +16,31 @@ import (
 	rpc "github.com/mikkeloscar/aur"
 )
 
-const arrow = "==>"
-const smallArrow = " ->"
-
 func (warnings *aurWarnings) print() {
 	if len(warnings.Missing) > 0 {
-		fmt.Print(bold(yellow(smallArrow)) + " Missing AUR Packages:")
+		fmt.Print(generic.Bold(generic.Yellow(generic.SmallArrow)) + " Missing AUR Packages:")
 		for _, name := range warnings.Missing {
-			fmt.Print("  " + cyan(name))
+			fmt.Print("  " + generic.Cyan(name))
 		}
 		fmt.Println()
 	}
 
 	if len(warnings.Orphans) > 0 {
-		fmt.Print(bold(yellow(smallArrow)) + " Orphaned AUR Packages:")
+		fmt.Print(generic.Bold(generic.Yellow(generic.SmallArrow)) + " Orphaned AUR Packages:")
 		for _, name := range warnings.Orphans {
-			fmt.Print("  " + cyan(name))
+			fmt.Print("  " + generic.Cyan(name))
 		}
 		fmt.Println()
 	}
 
 	if len(warnings.OutOfDate) > 0 {
-		fmt.Print(bold(yellow(smallArrow)) + " Out Of Date AUR Packages:")
+		fmt.Print(generic.Bold(generic.Yellow(generic.SmallArrow)) + " Out Of Date AUR Packages:")
 		for _, name := range warnings.OutOfDate {
-			fmt.Print("  " + cyan(name))
+			fmt.Print("  " + generic.Cyan(name))
 		}
 		fmt.Println()
 	}
 
-}
-
-// human method returns results in human readable format.
-func human(size int64) string {
-	floatsize := float32(size)
-	units := [...]string{"", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi"}
-	for _, unit := range units {
-		if floatsize < 1024 {
-			return fmt.Sprintf("%.1f %sB", floatsize, unit)
-		}
-		floatsize /= 1024
-	}
-	return fmt.Sprintf("%d%s", size, "B")
 }
 
 // PrintSearch handles printing search results in a given format
@@ -67,33 +51,33 @@ func (q aurQuery) printSearch(start int) {
 		var toprint string
 		if config.SearchMode == numberMenu {
 			if config.SortMode == bottomUp {
-				toprint += magenta(strconv.Itoa(len(q)+start-i-1) + " ")
+				toprint += generic.Magenta(strconv.Itoa(len(q)+start-i-1) + " ")
 			} else {
-				toprint += magenta(strconv.Itoa(start+i) + " ")
+				toprint += generic.Magenta(strconv.Itoa(start+i) + " ")
 			}
 		} else if config.SearchMode == minimal {
 			fmt.Println(res.Name)
 			continue
 		}
 
-		toprint += bold(colourHash("aur")) + "/" + bold(res.Name) +
-			" " + cyan(res.Version) +
-			bold(" (+"+strconv.Itoa(res.NumVotes)) +
-			" " + bold(strconv.FormatFloat(res.Popularity, 'f', 2, 64)+"%) ")
+		toprint += generic.Bold(generic.ColourHash("aur")) + "/" + generic.Bold(res.Name) +
+			" " + generic.Cyan(res.Version) +
+			generic.Bold(" (+"+strconv.Itoa(res.NumVotes)) +
+			" " + generic.Bold(strconv.FormatFloat(res.Popularity, 'f', 2, 64)+"%) ")
 
 		if res.Maintainer == "" {
-			toprint += bold(red("(Orphaned)")) + " "
+			toprint += generic.Bold(generic.Red("(Orphaned)")) + " "
 		}
 
 		if res.OutOfDate != 0 {
-			toprint += bold(red("(Out-of-date "+formatTime(res.OutOfDate)+")")) + " "
+			toprint += generic.Bold(generic.Red("(Out-of-date "+formatTime(res.OutOfDate)+")")) + " "
 		}
 
 		if pkg := localDB.Pkg(res.Name); pkg != nil {
 			if pkg.Version() != res.Version {
-				toprint += bold(green("(Installed: " + pkg.Version() + ")"))
+				toprint += generic.Bold(generic.Green("(Installed: " + pkg.Version() + ")"))
 			} else {
-				toprint += bold(green("(Installed)"))
+				toprint += generic.Bold(generic.Green("(Installed)"))
 			}
 		}
 		toprint += "\n    " + res.Description
@@ -107,19 +91,19 @@ func (s repoQuery) printSearch() {
 		var toprint string
 		if config.SearchMode == numberMenu {
 			if config.SortMode == bottomUp {
-				toprint += magenta(strconv.Itoa(len(s)-i) + " ")
+				toprint += generic.Magenta(strconv.Itoa(len(s)-i) + " ")
 			} else {
-				toprint += magenta(strconv.Itoa(i+1) + " ")
+				toprint += generic.Magenta(strconv.Itoa(i+1) + " ")
 			}
 		} else if config.SearchMode == minimal {
 			fmt.Println(res.Name())
 			continue
 		}
 
-		toprint += bold(colourHash(res.DB().Name())) + "/" + bold(res.Name()) +
-			" " + cyan(res.Version()) +
-			bold(" ("+human(res.Size())+
-				" "+human(res.ISize())+") ")
+		toprint += generic.Bold(generic.ColourHash(res.DB().Name())) + "/" + generic.Bold(res.Name()) +
+			" " + generic.Cyan(res.Version()) +
+			generic.Bold(" ("+generic.Human(res.Size())+
+				" "+generic.Human(res.ISize())+") ")
 
 		if len(res.Groups().Slice()) != 0 {
 			toprint += fmt.Sprint(res.Groups().Slice(), " ")
@@ -129,9 +113,9 @@ func (s repoQuery) printSearch() {
 		if err == nil {
 			if pkg := localDB.Pkg(res.Name()); pkg != nil {
 				if pkg.Version() != res.Version() {
-					toprint += bold(green("(Installed: " + pkg.Version() + ")"))
+					toprint += generic.Bold(generic.Green("(Installed: " + pkg.Version() + ")"))
 				} else {
-					toprint += bold(green("(Installed)"))
+					toprint += generic.Bold(generic.Green("(Installed)"))
 				}
 			}
 		}
@@ -161,7 +145,7 @@ func (base Base) String() string {
 }
 
 func (u upgrade) StylizedNameWithRepository() string {
-	return bold(colourHash(u.Repository)) + "/" + bold(u.Name)
+	return generic.Bold(generic.ColourHash(u.Repository)) + "/" + generic.Bold(u.Name)
 }
 
 // Print prints the details of the packages to upgrade.
@@ -182,7 +166,7 @@ func (u upSlice) print() {
 	for k, i := range u {
 		left, right := getVersionDiff(i.LocalVersion, i.RemoteVersion)
 
-		fmt.Print(magenta(fmt.Sprintf(numberPadding, len(u)-k)))
+		fmt.Print(generic.Magenta(fmt.Sprintf(numberPadding, len(u)-k)))
 
 		fmt.Printf(namePadding, i.StylizedNameWithRepository())
 
@@ -266,9 +250,9 @@ func printDownloads(repoName string, length int, packages string) {
 		return
 	}
 
-	repoInfo := bold(blue(
+	repoInfo := generic.Bold(generic.Blue(
 		"[" + repoName + ": " + strconv.Itoa(length) + "]"))
-	fmt.Println(repoInfo + cyan(packages))
+	fmt.Println(repoInfo + generic.Cyan(packages))
 }
 
 func printInfoValue(str, value string) {
@@ -276,7 +260,7 @@ func printInfoValue(str, value string) {
 		value = "None"
 	}
 
-	fmt.Printf(bold("%-16s%s")+" %s\n", str, ":", value)
+	fmt.Printf(generic.Bold("%-16s%s")+" %s\n", str, ":", value)
 }
 
 // PrintInfo prints package info like pacman -Si.
@@ -333,7 +317,7 @@ func biggestPackages() {
 	}
 
 	for i := 0; i < 10; i++ {
-		fmt.Println(bold(pkgS[i].Name()) + ": " + cyan(human(pkgS[i].ISize())))
+		fmt.Println(generic.Bold(pkgS[i].Name()) + ": " + generic.Cyan(generic.Human(pkgS[i].ISize())))
 	}
 	// Could implement size here as well, but we just want the general idea
 }
@@ -350,16 +334,16 @@ func localStatistics() error {
 		return err
 	}
 
-	fmt.Printf(bold("Yay version v%s\n"), version)
-	fmt.Println(bold(cyan("===========================================")))
-	fmt.Println(bold(green("Total installed packages: ")) + cyan(strconv.Itoa(info.Totaln)))
-	fmt.Println(bold(green("Total foreign installed packages: ")) + cyan(strconv.Itoa(len(remoteNames))))
-	fmt.Println(bold(green("Explicitly installed packages: ")) + cyan(strconv.Itoa(info.Expln)))
-	fmt.Println(bold(green("Total Size occupied by packages: ")) + cyan(human(info.TotalSize)))
-	fmt.Println(bold(cyan("===========================================")))
-	fmt.Println(bold(green("Ten biggest packages:")))
+	fmt.Printf(generic.Bold("Yay version v%s\n"), version)
+	fmt.Println(generic.Bold(generic.Cyan("===========================================")))
+	fmt.Println(generic.Bold(generic.Green("Total installed packages: ")) + generic.Cyan(strconv.Itoa(info.Totaln)))
+	fmt.Println(generic.Bold(generic.Green("Total foreign installed packages: ")) + generic.Cyan(strconv.Itoa(len(remoteNames))))
+	fmt.Println(generic.Bold(generic.Green("Explicitly installed packages: ")) + generic.Cyan(strconv.Itoa(info.Expln)))
+	fmt.Println(generic.Bold(generic.Green("Total Size occupied by packages: ")) + generic.Cyan(generic.Human(info.TotalSize)))
+	fmt.Println(generic.Bold(generic.Cyan("===========================================")))
+	fmt.Println(generic.Bold(generic.Green("Ten biggest packages:")))
 	biggestPackages()
-	fmt.Println(bold(cyan("===========================================")))
+	fmt.Println(generic.Bold(generic.Cyan("===========================================")))
 
 	aurInfoPrint(remoteNames)
 
@@ -407,7 +391,7 @@ func printUpdateList(parser *arguments) error {
 				if parser.existsArg("q", "quiet") {
 					fmt.Printf("%s\n", pkg.Name)
 				} else {
-					fmt.Printf("%s %s -> %s\n", bold(pkg.Name), green(pkg.LocalVersion), green(pkg.RemoteVersion))
+					fmt.Printf("%s %s -> %s\n", generic.Bold(pkg.Name), generic.Green(pkg.LocalVersion), generic.Green(pkg.RemoteVersion))
 				}
 				delete(targets, pkg.Name)
 			}
@@ -420,7 +404,7 @@ func printUpdateList(parser *arguments) error {
 				if parser.existsArg("q", "quiet") {
 					fmt.Printf("%s\n", pkg.Name)
 				} else {
-					fmt.Printf("%s %s -> %s\n", bold(pkg.Name), green(pkg.LocalVersion), green(pkg.RemoteVersion))
+					fmt.Printf("%s %s -> %s\n", generic.Bold(pkg.Name), generic.Green(pkg.LocalVersion), generic.Green(pkg.RemoteVersion))
 				}
 				delete(targets, pkg.Name)
 			}
@@ -443,7 +427,7 @@ outer:
 			}
 		}
 
-		fmt.Fprintln(os.Stderr, red(bold("error:")), "package '"+pkg+"' was not found")
+		fmt.Fprintln(os.Stderr, generic.Red(generic.Bold("error:")), "package '"+pkg+"' was not found")
 		missing = true
 	}
 
@@ -477,7 +461,7 @@ func (item item) print(buildTime time.Time) {
 		}
 	}
 
-	fmt.Println(bold(magenta(fd)), bold(strings.TrimSpace(item.Title)))
+	fmt.Println(generic.Bold(generic.Magenta(fd)), generic.Bold(strings.TrimSpace(item.Title)))
 	//fmt.Println(strings.TrimSpace(item.Link))
 
 	if !cmdArgs.existsArg("q", "quiet") {
@@ -549,75 +533,14 @@ func formatTimeQuery(i int) string {
 	return t.Format("Mon 02 Jan 2006 03:04:05 PM MST")
 }
 
-const (
-	redCode     = "\x1b[31m"
-	greenCode   = "\x1b[32m"
-	yellowCode  = "\x1b[33m"
-	blueCode    = "\x1b[34m"
-	magentaCode = "\x1b[35m"
-	cyanCode    = "\x1b[36m"
-	boldCode    = "\x1b[1m"
-
-	resetCode = "\x1b[0m"
-)
-
-func stylize(startCode, in string) string {
-	if useColor {
-		return startCode + in + resetCode
-	}
-
-	return in
-}
-
-func red(in string) string {
-	return stylize(redCode, in)
-}
-
-func green(in string) string {
-	return stylize(greenCode, in)
-}
-
-func yellow(in string) string {
-	return stylize(yellowCode, in)
-}
-
-func blue(in string) string {
-	return stylize(blueCode, in)
-}
-
-func cyan(in string) string {
-	return stylize(cyanCode, in)
-}
-
-func magenta(in string) string {
-	return stylize(magentaCode, in)
-}
-
-func bold(in string) string {
-	return stylize(boldCode, in)
-}
-
-// Colours text using a hashing algorithm. The same text will always produce the
-// same colour while different text will produce a different colour.
-func colourHash(name string) (output string) {
-	if !useColor {
-		return name
-	}
-	var hash uint = 5381
-	for i := 0; i < len(name); i++ {
-		hash = uint(name[i]) + ((hash << 5) + (hash))
-	}
-	return fmt.Sprintf("\x1b[%dm%s\x1b[0m", hash%6+31, name)
-}
-
 func providerMenu(dep string, providers providers) *rpc.Pkg {
 	size := providers.Len()
 
-	fmt.Print(bold(cyan(":: ")))
-	str := bold(fmt.Sprintf(bold("There are %d providers available for %s:"), size, dep))
+	fmt.Print(generic.Bold(generic.Cyan(":: ")))
+	str := generic.Bold(fmt.Sprintf(generic.Bold("There are %d providers available for %s:"), size, dep))
 
 	size = 1
-	str += bold(cyan("\n:: ")) + bold("Repository AUR\n    ")
+	str += generic.Bold(generic.Cyan("\n:: ")) + generic.Bold("Repository AUR\n    ")
 
 	for _, pkg := range providers.Pkgs {
 		str += fmt.Sprintf("%d) %s ", size, pkg.Name)
@@ -653,12 +576,12 @@ func providerMenu(dep string, providers providers) *rpc.Pkg {
 
 		num, err := strconv.Atoi(string(numberBuf))
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%s invalid number: %s\n", red("error:"), string(numberBuf))
+			fmt.Fprintf(os.Stderr, "%s invalid number: %s\n", generic.Red("error:"), string(numberBuf))
 			continue
 		}
 
 		if num < 1 || num > size {
-			fmt.Fprintf(os.Stderr, "%s invalid value: %d is not between %d and %d\n", red("error:"), num, 1, size)
+			fmt.Fprintf(os.Stderr, "%s invalid value: %d is not between %d and %d\n", generic.Red("error:"), num, 1, size)
 			continue
 		}
 

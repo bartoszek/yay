@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/Jguer/yay/v9/generic"
 	alpm "github.com/jguer/go-alpm"
 )
 
@@ -333,8 +334,8 @@ func displayNumberMenu(pkgS []string) (err error) {
 		fmt.Fprintln(os.Stderr, "Showing repo packages only")
 	}
 
-	fmt.Println(bold(green(arrow + " Packages to install (eg: 1 2 3, 1-3 or ^4)")))
-	fmt.Print(bold(green(arrow + " ")))
+	fmt.Println(generic.Bold(generic.Green(generic.Arrow + " Packages to install (eg: 1 2 3, 1-3 or ^4)")))
+	fmt.Print(generic.Bold(generic.Green(generic.Arrow + " ")))
 
 	reader := bufio.NewReader(os.Stdin)
 
@@ -417,10 +418,10 @@ func syncList(parser *arguments) error {
 			if cmdArgs.existsArg("q", "quiet") {
 				fmt.Println(name)
 			} else {
-				fmt.Printf("%s %s %s", magenta("aur"), bold(name), bold(green("unknown-version")))
+				fmt.Printf("%s %s %s", generic.Magenta("aur"), generic.Bold(name), generic.Bold(generic.Green("unknown-version")))
 
 				if localDB.Pkg(name) != nil {
-					fmt.Print(bold(blue(" [Installed]")))
+					fmt.Print(generic.Bold(generic.Blue(" [Installed]")))
 				}
 
 				fmt.Println()

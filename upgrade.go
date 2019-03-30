@@ -65,7 +65,7 @@ func (u upSlice) Less(i, j int) bool {
 
 func getVersionDiff(oldVersion, newVersion string) (left, right string) {
 	if oldVersion == newVersion {
-		return oldVersion + red(""), newVersion + green("")
+		return oldVersion + generic.Red(""), newVersion + generic.Green("")
 	}
 
 	diffPosition := 0
@@ -103,8 +103,8 @@ func getVersionDiff(oldVersion, newVersion string) (left, right string) {
 
 	samePart := oldVersion[0:diffPosition]
 
-	left = samePart + red(oldVersion[diffPosition:])
-	right = samePart + green(newVersion[diffPosition:])
+	left = samePart + generic.Red(oldVersion[diffPosition:])
+	right = samePart + generic.Green(newVersion[diffPosition:])
 
 	return
 }
@@ -126,7 +126,7 @@ func upList(warnings *aurWarnings) (upSlice, upSlice, error) {
 	aurdata := make(map[string]*rpc.Pkg)
 
 	if mode == modeAny || mode == modeRepo {
-		fmt.Println(bold(cyan("::") + bold(" Searching databases for updates...")))
+		fmt.Println(generic.Bold(generic.Cyan("::") + generic.Bold(" Searching databases for updates...")))
 		wg.Add(1)
 		go func() {
 			repoUp, err = upRepo(local)
@@ -136,7 +136,7 @@ func upList(warnings *aurWarnings) (upSlice, upSlice, error) {
 	}
 
 	if mode == modeAny || mode == modeAUR {
-		fmt.Println(bold(cyan("::") + bold(" Searching AUR for updates...")))
+		fmt.Println(generic.Bold(generic.Cyan("::") + generic.Bold(" Searching AUR for updates...")))
 
 		var _aurdata []*rpc.Pkg
 		_aurdata, err = aurInfo(remoteNames, warnings)
@@ -154,7 +154,7 @@ func upList(warnings *aurWarnings) (upSlice, upSlice, error) {
 			}()
 
 			if config.Devel {
-				fmt.Println(bold(cyan("::") + bold(" Checking development packages...")))
+				fmt.Println(generic.Bold(generic.Cyan("::") + generic.Bold(" Checking development packages...")))
 				wg.Add(1)
 				go func() {
 					develUp = upDevel(remote, aurdata)
@@ -261,8 +261,8 @@ func printIgnoringPackage(pkg alpm.Package, newPkgVersion string) {
 	left, right := getVersionDiff(pkg.Version(), newPkgVersion)
 
 	fmt.Printf("%s %s: ignoring package upgrade (%s => %s)\n",
-		yellow(bold(smallArrow)),
-		cyan(pkg.Name()),
+		generic.Yellow(generic.Bold(generic.SmallArrow)),
+		generic.Cyan(pkg.Name()),
 		left, right,
 	)
 }
@@ -279,8 +279,8 @@ func printLocalNewerThanAUR(
 
 		if !isDevelName(pkg.Name()) && alpm.VerCmp(pkg.Version(), aurPkg.Version) > 0 {
 			fmt.Printf("%s %s: local (%s) is newer than AUR (%s)\n",
-				yellow(bold(smallArrow)),
-				cyan(pkg.Name()),
+				generic.Yellow(generic.Bold(generic.SmallArrow)),
+				generic.Cyan(pkg.Name()),
 				left, right,
 			)
 		}
@@ -345,11 +345,11 @@ func upgradePkgs(aurUp, repoUp upSlice) (generic.StringSet, generic.StringSet, e
 	sort.Sort(repoUp)
 	sort.Sort(aurUp)
 	allUp := append(repoUp, aurUp...)
-	fmt.Printf("%s"+bold(" %d ")+"%s\n", bold(cyan("::")), allUpLen, bold("Packages to upgrade."))
+	fmt.Printf("%s"+generic.Bold(" %d ")+"%s\n", generic.Bold(generic.Cyan("::")), allUpLen, generic.Bold("Packages to upgrade."))
 	allUp.print()
 
-	fmt.Println(bold(green(arrow + " Packages to not upgrade: (eg: 1 2 3, 1-3, ^4 or repo name)")))
-	fmt.Print(bold(green(arrow + " ")))
+	fmt.Println(generic.Bold(generic.Green(generic.Arrow + " Packages to not upgrade: (eg: 1 2 3, 1-3, ^4 or repo name)")))
+	fmt.Print(generic.Bold(generic.Green(generic.Arrow + " ")))
 
 	numbers, err := getInput(config.AnswerUpgrade)
 	if err != nil {
