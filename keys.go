@@ -11,7 +11,7 @@ import (
 )
 
 // pgpKeySet maps a PGP key with a list of PKGBUILDs that require it.
-// This is similar to stringSet, used throughout the code.
+// This is similar to generic.StringSet, used throughout the code.
 type pgpKeySet map[string][]Base
 
 func (set pgpKeySet) toSlice() []string {

@@ -10,63 +10,9 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/Jguer/yay/v9/generic"
 	rpc "github.com/mikkeloscar/aur"
 )
-
-// A basic set implementation for strings.
-// This is used a lot so it deserves its own type.
-// Other types of sets are used throughout the code but do not have
-// their own typedef.
-// String sets and <type>sets should be used throughout the code when applicable,
-// they are a lot more flexible than slices and provide easy lookup.
-type stringSet map[string]struct{}
-
-func (set stringSet) set(v string) {
-	set[v] = struct{}{}
-}
-
-func (set stringSet) get(v string) bool {
-	_, exists := set[v]
-	return exists
-}
-
-func (set stringSet) remove(v string) {
-	delete(set, v)
-}
-
-func (set stringSet) toSlice() []string {
-	slice := make([]string, 0, len(set))
-
-	for v := range set {
-		slice = append(slice, v)
-	}
-
-	return slice
-}
-
-func (set stringSet) copy() stringSet {
-	newSet := make(stringSet)
-
-	for str := range set {
-		newSet.set(str)
-	}
-
-	return newSet
-}
-
-func sliceToStringSet(in []string) stringSet {
-	set := make(stringSet)
-
-	for _, v := range in {
-		set.set(v)
-	}
-
-	return set
-}
-
-func makeStringSet(in ...string) stringSet {
-	return sliceToStringSet(in)
-}
 
 // Parses command line arguments in a way we can interact with programmatically but
 // also in a way that can easily be passed to pacman later on.
@@ -74,7 +20,7 @@ type arguments struct {
 	op      string
 	options map[string]string
 	globals map[string]string
-	doubles stringSet // Tracks args passed twice such as -yy and -dd
+	doubles generic.StringSet // Tracks args passed twice such as -yy and -dd
 	targets []string
 }
 
@@ -83,7 +29,7 @@ func makeArguments() *arguments {
 		"",
 		make(map[string]string),
 		make(map[string]string),
-		make(stringSet),
+		make(generic.StringSet),
 		make([]string, 0),
 	}
 }
@@ -893,11 +839,11 @@ func (parser *arguments) extractYayOptions() {
 //intended to allow words inside of number menus. e.g. 'all' 'none' 'abort'
 //of course the implementation is up to the caller, this function mearley parses
 //the input and organizes it
-func parseNumberMenu(input string) (intRanges, intRanges, stringSet, stringSet) {
-	include := make(intRanges, 0)
-	exclude := make(intRanges, 0)
-	otherInclude := make(stringSet)
-	otherExclude := make(stringSet)
+func parseNumberMenu(input string) (generic.IntRanges, generic.IntRanges, generic.StringSet, generic.StringSet) {
+	include := make(generic.IntRanges, 0)
+	exclude := make(generic.IntRanges, 0)
+	otherInclude := make(generic.StringSet)
+	otherExclude := make(generic.StringSet)
 
 	words := strings.FieldsFunc(input, func(c rune) bool {
 		return unicode.IsSpace(c) || c == ','
@@ -920,27 +866,27 @@ func parseNumberMenu(input string) (intRanges, intRanges, stringSet, stringSet) 
 
 		num1, err = strconv.Atoi(ranges[0])
 		if err != nil {
-			other.set(strings.ToLower(word))
+			other.Set(strings.ToLower(word))
 			continue
 		}
 
 		if len(ranges) == 2 {
 			num2, err = strconv.Atoi(ranges[1])
 			if err != nil {
-				other.set(strings.ToLower(word))
+				other.Set(strings.ToLower(word))
 				continue
 			}
 		} else {
 			num2 = num1
 		}
 
-		mi := min(num1, num2)
-		ma := max(num1, num2)
+		mi := generic.Min(num1, num2)
+		ma := generic.Max(num1, num2)
 
 		if !invert {
-			include = append(include, makeIntRange(mi, ma))
+			include = append(include, generic.MakeIntRange(mi, ma))
 		} else {
-			exclude = append(exclude, makeIntRange(mi, ma))
+			exclude = append(exclude, generic.MakeIntRange(mi, ma))
 		}
 	}
 

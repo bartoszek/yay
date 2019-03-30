@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Jguer/yay/v9/generic"
 	rpc "github.com/mikkeloscar/aur"
 )
 
@@ -170,8 +171,8 @@ func (u upSlice) print() {
 		packNameLen := len(pack.StylizedNameWithRepository())
 		version, _ := getVersionDiff(pack.LocalVersion, pack.RemoteVersion)
 		packVersionLen := len(version)
-		longestName = max(packNameLen, longestName)
-		longestVersion = max(packVersionLen, longestVersion)
+		longestName = generic.Max(packNameLen, longestName)
+		longestVersion = generic.Max(packVersionLen, longestVersion)
 	}
 
 	namePadding := fmt.Sprintf("%%-%ds  ", longestName)
@@ -202,7 +203,7 @@ func (do *depOrder) Print() {
 	aurMakeLen := 0
 
 	for _, pkg := range do.Repo {
-		if do.Runtime.get(pkg.Name()) {
+		if do.Runtime.Get(pkg.Name()) {
 			repo += "  " + pkg.Name() + "-" + pkg.Version()
 			repoLen++
 		} else {
@@ -225,7 +226,7 @@ func (do *depOrder) Print() {
 			pkgStrMake += " ("
 
 			for _, split := range base {
-				if do.Runtime.get(split.Name) {
+				if do.Runtime.Get(split.Name) {
 					pkgStr += split.Name + " "
 					aurLen++
 					push = true
@@ -238,7 +239,7 @@ func (do *depOrder) Print() {
 
 			pkgStr = pkgStr[:len(pkgStr)-1] + ")"
 			pkgStrMake = pkgStrMake[:len(pkgStrMake)-1] + ")"
-		case do.Runtime.get(base[0].Name):
+		case do.Runtime.Get(base[0].Name):
 			aurLen++
 			push = true
 		default:
@@ -383,7 +384,7 @@ func printNumberOfUpdates() error {
 
 //TODO: Make it less hacky
 func printUpdateList(parser *arguments) error {
-	targets := sliceToStringSet(parser.targets)
+	targets := generic.SliceToStringSet(parser.targets)
 	warnings := &aurWarnings{}
 	old := os.Stdout // keep backup of the real stdout
 	os.Stdout = nil
@@ -402,7 +403,7 @@ func printUpdateList(parser *arguments) error {
 
 	if !parser.existsArg("m", "foreign") {
 		for _, pkg := range repoUp {
-			if noTargets || targets.get(pkg.Name) {
+			if noTargets || targets.Get(pkg.Name) {
 				if parser.existsArg("q", "quiet") {
 					fmt.Printf("%s\n", pkg.Name)
 				} else {
@@ -415,7 +416,7 @@ func printUpdateList(parser *arguments) error {
 
 	if !parser.existsArg("n", "native") {
 		for _, pkg := range aurUp {
-			if noTargets || targets.get(pkg.Name) {
+			if noTargets || targets.Get(pkg.Name) {
 				if parser.existsArg("q", "quiet") {
 					fmt.Printf("%s\n", pkg.Name)
 				} else {

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Jguer/yay/v9/generic"
+
 	alpm "github.com/jguer/go-alpm"
 	rpc "github.com/mikkeloscar/aur"
 )
@@ -33,7 +35,7 @@ func (q providers) Less(i, j int) bool {
 		return false
 	}
 
-	return lessRunes([]rune(q.Pkgs[i].Name), []rune(q.Pkgs[j].Name))
+	return generic.LessRunes([]rune(q.Pkgs[i].Name), []rune(q.Pkgs[j].Name))
 }
 
 func (q providers) Swap(i, j int) {

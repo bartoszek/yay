@@ -357,7 +357,7 @@ func displayNumberMenu(pkgS []string) (err error) {
 			target = i + 1
 		}
 
-		if (isInclude && include.get(target)) || (!isInclude && !exclude.get(target)) {
+		if (isInclude && include.Get(target)) || (!isInclude && !exclude.Get(target)) {
 			arguments.addTarget(pkg.DB().Name() + "/" + pkg.Name())
 		}
 	}
@@ -368,7 +368,7 @@ func displayNumberMenu(pkgS []string) (err error) {
 			target = i + 1 + len(pq)
 		}
 
-		if (isInclude && include.get(target)) || (!isInclude && !exclude.get(target)) {
+		if (isInclude && include.Get(target)) || (!isInclude && !exclude.Get(target)) {
 			arguments.addTarget("aur/" + pkg.Name)
 		}
 	}

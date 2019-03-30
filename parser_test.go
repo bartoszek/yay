@@ -1,8 +1,9 @@
 package main
 
 import "testing"
+import "github.com/Jguer/yay/v9/generic"
 
-func intRangesEqual(a, b intRanges) bool {
+func intRangesEqual(a, b generic.IntRanges) bool {
 	if a == nil && b == nil {
 		return true
 	}
@@ -19,7 +20,7 @@ func intRangesEqual(a, b intRanges) bool {
 		r1 := a[n]
 		r2 := b[n]
 
-		if r1.min != r2.min || r1.max != r2.max {
+		if r1.Min != r2.Min || r1.Max != r2.Max {
 			return false
 		}
 	}
@@ -27,7 +28,7 @@ func intRangesEqual(a, b intRanges) bool {
 	return true
 }
 
-func stringSetEqual(a, b stringSet) bool {
+func stringSetEqual(a, b generic.StringSet) bool {
 	if a == nil && b == nil {
 		return true
 	}
@@ -41,20 +42,19 @@ func stringSetEqual(a, b stringSet) bool {
 	}
 
 	for n := range a {
-		if !b.get(n) {
+		if !b.Get(n) {
 			return false
 		}
 	}
 
 	return true
 }
-
 func TestParseNumberMenu(t *testing.T) {
 	type result struct {
-		Include      intRanges
-		Exclude      intRanges
-		OtherInclude stringSet
-		OtherExclude stringSet
+		Include      generic.IntRanges
+		Exclude      generic.IntRanges
+		OtherInclude generic.StringSet
+		OtherExclude generic.StringSet
 	}
 
 	inputs := []string{
@@ -72,17 +72,17 @@ func TestParseNumberMenu(t *testing.T) {
 	}
 
 	expected := []result{
-		{intRanges{makeIntRange(1, 1), makeIntRange(2, 2), makeIntRange(3, 3), makeIntRange(4, 4), makeIntRange(5, 5)}, intRanges{}, make(stringSet), make(stringSet)},
-		{intRanges{makeIntRange(1, 10), makeIntRange(5, 15)}, intRanges{}, make(stringSet), make(stringSet)},
-		{intRanges{makeIntRange(5, 10), makeIntRange(85, 90)}, intRanges{}, make(stringSet), make(stringSet)},
-		{intRanges{makeIntRange(1, 1), makeIntRange(99, 99), makeIntRange(60, 62)}, intRanges{makeIntRange(2, 2), makeIntRange(5, 10), makeIntRange(38, 40), makeIntRange(123, 123)}, make(stringSet), make(stringSet)},
-		{intRanges{}, intRanges{}, makeStringSet("abort", "all", "none"), make(stringSet)},
-		{intRanges{}, intRanges{}, makeStringSet("a-b"), makeStringSet("abort", "a-b")},
-		{intRanges{makeIntRange(1, 1), makeIntRange(2, 2), makeIntRange(3, 3), makeIntRange(4, 4), makeIntRange(5, 5)}, intRanges{}, make(stringSet), make(stringSet)},
-		{intRanges{makeIntRange(1, 1), makeIntRange(2, 2), makeIntRange(3, 3), makeIntRange(4, 4), makeIntRange(5, 5), makeIntRange(6, 6), makeIntRange(7, 7), makeIntRange(8, 8)}, intRanges{}, make(stringSet), make(stringSet)},
-		{intRanges{}, intRanges{}, make(stringSet), make(stringSet)},
-		{intRanges{}, intRanges{}, make(stringSet), make(stringSet)},
-		{intRanges{}, intRanges{}, makeStringSet("a", "b", "c", "d", "e"), make(stringSet)},
+		{generic.IntRanges{generic.MakeIntRange(1, 1), generic.MakeIntRange(2, 2), generic.MakeIntRange(3, 3), generic.MakeIntRange(4, 4), generic.MakeIntRange(5, 5)}, generic.IntRanges{}, make(generic.StringSet), make(generic.StringSet)},
+		{generic.IntRanges{generic.MakeIntRange(1, 10), generic.MakeIntRange(5, 15)}, generic.IntRanges{}, make(generic.StringSet), make(generic.StringSet)},
+		{generic.IntRanges{generic.MakeIntRange(5, 10), generic.MakeIntRange(85, 90)}, generic.IntRanges{}, make(generic.StringSet), make(generic.StringSet)},
+		{generic.IntRanges{generic.MakeIntRange(1, 1), generic.MakeIntRange(99, 99), generic.MakeIntRange(60, 62)}, generic.IntRanges{generic.MakeIntRange(2, 2), generic.MakeIntRange(5, 10), generic.MakeIntRange(38, 40), generic.MakeIntRange(123, 123)}, make(generic.StringSet), make(generic.StringSet)},
+		{generic.IntRanges{}, generic.IntRanges{}, generic.MakeStringSet("abort", "all", "none"), make(generic.StringSet)},
+		{generic.IntRanges{}, generic.IntRanges{}, generic.MakeStringSet("a-b"), generic.MakeStringSet("abort", "a-b")},
+		{generic.IntRanges{generic.MakeIntRange(1, 1), generic.MakeIntRange(2, 2), generic.MakeIntRange(3, 3), generic.MakeIntRange(4, 4), generic.MakeIntRange(5, 5)}, generic.IntRanges{}, make(generic.StringSet), make(generic.StringSet)},
+		{generic.IntRanges{generic.MakeIntRange(1, 1), generic.MakeIntRange(2, 2), generic.MakeIntRange(3, 3), generic.MakeIntRange(4, 4), generic.MakeIntRange(5, 5), generic.MakeIntRange(6, 6), generic.MakeIntRange(7, 7), generic.MakeIntRange(8, 8)}, generic.IntRanges{}, make(generic.StringSet), make(generic.StringSet)},
+		{generic.IntRanges{}, generic.IntRanges{}, make(generic.StringSet), make(generic.StringSet)},
+		{generic.IntRanges{}, generic.IntRanges{}, make(generic.StringSet), make(generic.StringSet)},
+		{generic.IntRanges{}, generic.IntRanges{}, generic.MakeStringSet("a", "b", "c", "d", "e"), make(generic.StringSet)},
 	}
 
 	for n, in := range inputs {

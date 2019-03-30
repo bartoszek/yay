@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/Jguer/yay/v9/generic"
 	alpm "github.com/jguer/go-alpm"
 )
 
@@ -199,7 +200,7 @@ func getPkgbuilds(pkgs []string) error {
 func getPkgbuildsfromABS(pkgs []string, path string) (bool, error) {
 	var wg sync.WaitGroup
 	var mux sync.Mutex
-	var errs MultiError
+	var errs generic.MultiError
 	names := make(map[string]string)
 	missing := make([]string, 0)
 	downloaded := 0

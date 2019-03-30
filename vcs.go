@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Jguer/yay/v9/generic"
 	gosrc "github.com/Morganamilo/go-srcinfo"
 )
 
@@ -37,7 +38,7 @@ func createDevelDB() error {
 	}
 
 	bases := getBases(info)
-	toSkip := pkgbuildsToSkip(bases, sliceToStringSet(remoteNames))
+	toSkip := pkgbuildsToSkip(bases, generic.SliceToStringSet(remoteNames))
 	downloadPkgbuilds(bases, toSkip, config.BuildDir)
 	srcinfos, _ := parseSrcinfoFiles(bases, false)
 

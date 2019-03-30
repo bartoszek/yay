@@ -1,20 +1,27 @@
 package main
 
 import (
+	"fmt"
+
+	"github.com/Jguer/yay/v9/generic"
 	alpm "github.com/jguer/go-alpm"
 	rpc "github.com/mikkeloscar/aur"
 )
 
+// Base represents a RPC package slice
 type Base []*rpc.Pkg
 
+// Pkgbase returns the PackageBase of the first package
 func (b Base) Pkgbase() string {
 	return b[0].PackageBase
 }
 
+// Version returns the Version of the first package
 func (b Base) Version() string {
 	return b[0].Version
 }
 
+// URLPath returns the URLPath of the first package
 func (b Base) URLPath() string {
 	return b[0].URLPath
 }
@@ -22,14 +29,14 @@ func (b Base) URLPath() string {
 type depOrder struct {
 	Aur     []Base
 	Repo    []*alpm.Package
-	Runtime stringSet
+	Runtime generic.StringSet
 }
 
 func makeDepOrder() *depOrder {
 	return &depOrder{
 		make([]Base, 0),
 		make([]*alpm.Package, 0),
-		make(stringSet),
+		make(generic.StringSet),
 	}
 }
 
@@ -57,9 +64,31 @@ func getDepOrder(dp *depPool) *depOrder {
 	return do
 }
 
+func removeInvalidTargets(targets []string) []string {
+	filteredTargets := make([]string, 0)
+
+	for _, target := range targets {
+		db, _ := splitDBFromName(target)
+
+		if db == "aur" && mode == modeRepo {
+			fmt.Printf("%s %s %s\n", bold(yellow(arrow)), cyan(target), bold("Can't use target with option --repo -- skipping"))
+			continue
+		}
+
+		if db != "aur" && db != "" && mode == modeAUR {
+			fmt.Printf("%s %s %s\n", bold(yellow(arrow)), cyan(target), bold("Can't use target with option --aur -- skipping"))
+			continue
+		}
+
+		filteredTargets = append(filteredTargets, target)
+	}
+
+	return filteredTargets
+}
+
 func (do *depOrder) orderPkgAur(pkg *rpc.Pkg, dp *depPool, runtime bool) {
 	if runtime {
-		do.Runtime.set(pkg.Name)
+		do.Runtime.Set(pkg.Name)
 	}
 	delete(dp.Aur, pkg.Name)
 
@@ -89,7 +118,7 @@ func (do *depOrder) orderPkgAur(pkg *rpc.Pkg, dp *depPool, runtime bool) {
 
 func (do *depOrder) orderPkgRepo(pkg *alpm.Package, dp *depPool, runtime bool) {
 	if runtime {
-		do.Runtime.set(pkg.Name())
+		do.Runtime.Set(pkg.Name())
 	}
 	delete(dp.Repo, pkg.Name())
 
@@ -119,14 +148,14 @@ func (do *depOrder) getMake() []string {
 
 	for _, base := range do.Aur {
 		for _, pkg := range base {
-			if !do.Runtime.get(pkg.Name) {
+			if !do.Runtime.Get(pkg.Name) {
 				makeOnly = append(makeOnly, pkg.Name)
 			}
 		}
 	}
 
 	for _, pkg := range do.Repo {
-		if !do.Runtime.get(pkg.Name()) {
+		if !do.Runtime.Get(pkg.Name()) {
 			makeOnly = append(makeOnly, pkg.Name())
 		}
 	}
