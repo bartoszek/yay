@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/Jguer/yay/v9/dep"
 	"github.com/Jguer/yay/v9/generic"
 	"github.com/Jguer/yay/v9/generic/exe"
 	alpm "github.com/jguer/go-alpm"
@@ -161,7 +162,7 @@ func getPkgbuilds(pkgs []string) error {
 
 	if len(aur) > 0 {
 		allBases := getBases(info)
-		bases := make([]Base, 0)
+		bases := make([]dep.Base, 0)
 
 		for _, base := range allBases {
 			name := base.Pkgbase()

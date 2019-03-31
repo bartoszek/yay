@@ -1,5 +1,12 @@
 package generic
 
+import (
+	"fmt"
+	"strings"
+
+	"github.com/Jguer/yay/v9/conf"
+)
+
 // StringSet is a basic set implementation for strings.
 // This is used a lot so it deserves its own type.
 // Other types of sets are used throughout the code but do not have
@@ -95,4 +102,34 @@ func StringSliceEqual(a, b []string) bool {
 	}
 
 	return true
+}
+
+// ContinueTask prompts if user wants to continue task.
+//If NoConfirm is set the action will continue without user input.
+func ContinueTask(s string, cont bool) bool {
+	if conf.Current.NoConfirm {
+		return cont
+	}
+
+	var response string
+	var postFix string
+	yes := "yes"
+	no := "no"
+	y := string([]rune(yes)[0])
+	n := string([]rune(no)[0])
+
+	if cont {
+		postFix = fmt.Sprintf(" [%s/%s] ", strings.ToUpper(y), n)
+	} else {
+		postFix = fmt.Sprintf(" [%s/%s] ", y, strings.ToUpper(n))
+	}
+
+	fmt.Print(Bold(Green(Arrow)+" "+s), Bold(postFix))
+
+	if _, err := fmt.Scanln(&response); err != nil {
+		return cont
+	}
+
+	response = strings.ToLower(response)
+	return response == yes || response == y
 }

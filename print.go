@@ -125,25 +125,6 @@ func (s repoQuery) printSearch() {
 	}
 }
 
-// Pretty print a set of packages from the same package base.
-// Packages foo and bar from a pkgbase named base would print like so:
-// base (foo bar)
-func (base Base) String() string {
-	pkg := base[0]
-	str := pkg.PackageBase
-	if len(base) > 1 || pkg.PackageBase != pkg.Name {
-		str2 := " ("
-		for _, split := range base {
-			str2 += split.Name + " "
-		}
-		str2 = str2[:len(str2)-1] + ")"
-
-		str += str2
-	}
-
-	return str
-}
-
 func (u upgrade) StylizedNameWithRepository() string {
 	return generic.Bold(generic.ColourHash(u.Repository)) + "/" + generic.Bold(u.Name)
 }

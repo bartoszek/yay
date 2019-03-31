@@ -1,4 +1,4 @@
-package main
+package keys
 
 import (
 	"bytes"
@@ -7,13 +7,15 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/Jguer/yay/v9/conf"
+	"github.com/Jguer/yay/v9/dep"
 	"github.com/Jguer/yay/v9/generic"
 	gosrc "github.com/Morganamilo/go-srcinfo"
 )
 
 // pgpKeySet maps a PGP key with a list of PKGBUILDs that require it.
 // This is similar to generic.StringSet, used throughout the code.
-type pgpKeySet map[string][]Base
+type pgpKeySet map[string][]dep.Base
 
 func (set pgpKeySet) toSlice() []string {
 	slice := make([]string, 0, len(set))
@@ -23,7 +25,7 @@ func (set pgpKeySet) toSlice() []string {
 	return slice
 }
 
-func (set pgpKeySet) set(key string, p Base) {
+func (set pgpKeySet) set(key string, p dep.Base) {
 	// Using ToUpper to make sure keys with a different case will be
 	// considered the same.
 	upperKey := strings.ToUpper(key)
@@ -36,13 +38,13 @@ func (set pgpKeySet) get(key string) bool {
 	return exists
 }
 
-// checkPgpKeys iterates through the keys listed in the PKGBUILDs and if needed,
+// CheckPgpKeys iterates through the keys listed in the PKGBUILDs and if needed,
 // asks the user whether yay should try to import them.
-func checkPgpKeys(bases []Base, srcinfos map[string]*gosrc.Srcinfo) error {
+func CheckPgpKeys(bases []dep.Base, srcinfos map[string]*gosrc.Srcinfo) error {
 	// Let's check the keys individually, and then we can offer to import
 	// the problematic ones.
 	problematic := make(pgpKeySet)
-	args := append(strings.Fields(config.GpgFlags), "--list-keys")
+	args := append(strings.Fields(conf.Current.GpgFlags), "--list-keys")
 
 	// Mapping all the keys.
 	for _, base := range bases {
@@ -57,7 +59,7 @@ func checkPgpKeys(bases []Base, srcinfos map[string]*gosrc.Srcinfo) error {
 				continue
 			}
 
-			cmd := exec.Command(config.GpgBin, append(args, key)...)
+			cmd := exec.Command(conf.Current.GpgBin, append(args, key)...)
 			err := cmd.Run()
 			if err != nil {
 				problematic.set(key, base)
@@ -78,7 +80,7 @@ func checkPgpKeys(bases []Base, srcinfos map[string]*gosrc.Srcinfo) error {
 	fmt.Println()
 	fmt.Println(str)
 
-	if continueTask(generic.Bold(generic.Green("Import?")), true) {
+	if generic.ContinueTask(generic.Bold(generic.Green("Import?")), true) {
 		return importKeys(problematic.toSlice())
 	}
 
@@ -87,8 +89,8 @@ func checkPgpKeys(bases []Base, srcinfos map[string]*gosrc.Srcinfo) error {
 
 // importKeys tries to import the list of keys specified in its argument.
 func importKeys(keys []string) error {
-	args := append(strings.Fields(config.GpgFlags), "--recv-keys")
-	cmd := exec.Command(config.GpgBin, append(args, keys...)...)
+	args := append(strings.Fields(conf.Current.GpgFlags), "--recv-keys")
+	cmd := exec.Command(conf.Current.GpgBin, append(args, keys...)...)
 	cmd.Stdin, cmd.Stdout, cmd.Stderr = os.Stdin, os.Stdout, os.Stderr
 
 	fmt.Printf("%s %s...\n", generic.Bold(generic.Cyan("::")), generic.Bold("Importing keys with gpg..."))

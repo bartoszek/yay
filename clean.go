@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/Jguer/yay/v9/dep"
 	"github.com/Jguer/yay/v9/generic"
 	"github.com/Jguer/yay/v9/generic/exe"
 )
@@ -89,7 +90,7 @@ func syncClean(parser *arguments) error {
 
 	fmt.Printf("\nBuild directory: %s\n", config.BuildDir)
 
-	if continueTask(question, true) {
+	if generic.ContinueTask(question, true) {
 		err = cleanAUR(keepInstalled, keepCurrent, removeAll)
 	}
 
@@ -97,7 +98,7 @@ func syncClean(parser *arguments) error {
 		return err
 	}
 
-	if continueTask("Do you want to remove ALL untracked AUR files?", true) {
+	if generic.ContinueTask("Do you want to remove ALL untracked AUR files?", true) {
 		return cleanUntracked()
 	}
 
@@ -200,7 +201,7 @@ func cleanUntracked() error {
 	return nil
 }
 
-func cleanAfter(bases []Base) {
+func cleanAfter(bases []dep.Base) {
 	fmt.Println("removing Untracked AUR files from cache...")
 
 	for i, base := range bases {
@@ -223,7 +224,7 @@ func cleanAfter(bases []Base) {
 	}
 }
 
-func cleanBuilds(bases []Base) {
+func cleanBuilds(bases []dep.Base) {
 	for i, base := range bases {
 		dir := filepath.Join(config.BuildDir, base.Pkgbase())
 		fmt.Printf(generic.Bold(generic.Cyan("::")+" Deleting (%d/%d): %s\n"), i+1, len(bases), generic.Cyan(dir))

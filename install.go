@@ -10,8 +10,10 @@ import (
 	"sync"
 
 	"github.com/Jguer/yay/v9/conf"
+	"github.com/Jguer/yay/v9/dep"
 	"github.com/Jguer/yay/v9/generic"
 	"github.com/Jguer/yay/v9/generic/exe"
+	"github.com/Jguer/yay/v9/install/keys"
 	gosrc "github.com/Morganamilo/go-srcinfo"
 	alpm "github.com/jguer/go-alpm"
 )
@@ -176,7 +178,7 @@ func install(parser *arguments) error {
 		case "no":
 			removeMake = false
 		default:
-			removeMake = continueTask("Remove make dependencies after install?", false)
+			removeMake = generic.ContinueTask("Remove make dependencies after install?", false)
 		}
 	}
 
@@ -198,8 +200,8 @@ func install(parser *arguments) error {
 		return err
 	}
 
-	var toDiff []Base
-	var toEdit []Base
+	var toDiff []dep.Base
+	var toEdit []dep.Base
 
 	if config.DiffMenu {
 		pkgbuildNumberMenu(do.Aur, remoteNamesCache)
@@ -220,7 +222,7 @@ func install(parser *arguments) error {
 		oldValue := config.NoConfirm
 		config.NoConfirm = false
 		fmt.Println()
-		if !continueTask(generic.Bold(generic.Green("Proceed with install?")), true) {
+		if !generic.ContinueTask(generic.Bold(generic.Green("Proceed with install?")), true) {
 			return fmt.Errorf("Aborting due to user")
 		}
 		config.NoConfirm = oldValue
@@ -255,7 +257,7 @@ func install(parser *arguments) error {
 		oldValue := config.NoConfirm
 		config.NoConfirm = false
 		fmt.Println()
-		if !continueTask(generic.Bold(generic.Green("Proceed with install?")), true) {
+		if !generic.ContinueTask(generic.Bold(generic.Green("Proceed with install?")), true) {
 			return fmt.Errorf("Aborting due to user")
 		}
 		config.NoConfirm = oldValue
@@ -267,7 +269,7 @@ func install(parser *arguments) error {
 	}
 
 	if config.PGPFetch {
-		err = checkPgpKeys(do.Aur, srcinfos)
+		err = keys.CheckPgpKeys(do.Aur, srcinfos)
 		if err != nil {
 			return err
 		}
@@ -419,9 +421,9 @@ func earlyRefresh(parser *arguments) error {
 	return exe.Show(passToPacman(arguments))
 }
 
-func getIncompatible(bases []Base, srcinfos map[string]*gosrc.Srcinfo) (generic.StringSet, error) {
+func getIncompatible(bases []dep.Base, srcinfos map[string]*gosrc.Srcinfo) (generic.StringSet, error) {
 	incompatible := make(generic.StringSet)
-	basesMap := make(map[string]Base)
+	basesMap := make(map[string]dep.Base)
 	alpmArch, err := alpmHandle.Arch()
 	if err != nil {
 		return nil, err
@@ -448,7 +450,7 @@ nextpkg:
 
 		fmt.Println()
 
-		if !continueTask("Try to build them anyway?", true) {
+		if !generic.ContinueTask("Try to build them anyway?", true) {
 			return nil, fmt.Errorf("Aborting due to user")
 		}
 	}
@@ -490,7 +492,7 @@ func parsePackageList(dir string) (map[string]string, string, error) {
 	return pkgdests, version, nil
 }
 
-func anyExistInCache(bases []Base) bool {
+func anyExistInCache(bases []dep.Base) bool {
 	for _, base := range bases {
 		pkg := base.Pkgbase()
 		dir := filepath.Join(config.BuildDir, pkg)
@@ -503,7 +505,7 @@ func anyExistInCache(bases []Base) bool {
 	return false
 }
 
-func pkgbuildNumberMenu(bases []Base, installed generic.StringSet) bool {
+func pkgbuildNumberMenu(bases []dep.Base, installed generic.StringSet) bool {
 	toPrint := ""
 	askClean := false
 
@@ -536,8 +538,8 @@ func pkgbuildNumberMenu(bases []Base, installed generic.StringSet) bool {
 	return askClean
 }
 
-func cleanNumberMenu(bases []Base, installed generic.StringSet, hasClean bool) ([]Base, error) {
-	toClean := make([]Base, 0)
+func cleanNumberMenu(bases []dep.Base, installed generic.StringSet, hasClean bool) ([]dep.Base, error) {
+	toClean := make([]dep.Base, 0)
 
 	if !hasClean {
 		return toClean, nil
@@ -605,16 +607,16 @@ func cleanNumberMenu(bases []Base, installed generic.StringSet, hasClean bool) (
 	return toClean, nil
 }
 
-func editNumberMenu(bases []Base, installed generic.StringSet) ([]Base, error) {
+func editNumberMenu(bases []dep.Base, installed generic.StringSet) ([]dep.Base, error) {
 	return editDiffNumberMenu(bases, installed, false)
 }
 
-func diffNumberMenu(bases []Base, installed generic.StringSet) ([]Base, error) {
+func diffNumberMenu(bases []dep.Base, installed generic.StringSet) ([]dep.Base, error) {
 	return editDiffNumberMenu(bases, installed, true)
 }
 
-func editDiffNumberMenu(bases []Base, installed generic.StringSet, diff bool) ([]Base, error) {
-	toEdit := make([]Base, 0)
+func editDiffNumberMenu(bases []dep.Base, installed generic.StringSet, diff bool) ([]dep.Base, error) {
+	toEdit := make([]dep.Base, 0)
 	var editInput string
 	var err error
 
@@ -683,7 +685,7 @@ func editDiffNumberMenu(bases []Base, installed generic.StringSet, diff bool) ([
 	return toEdit, nil
 }
 
-func showPkgbuildDiffs(bases []Base, cloned generic.StringSet) error {
+func showPkgbuildDiffs(bases []dep.Base, cloned generic.StringSet) error {
 	for _, base := range bases {
 		pkg := base.Pkgbase()
 		dir := filepath.Join(config.BuildDir, pkg)
@@ -730,7 +732,7 @@ func showPkgbuildDiffs(bases []Base, cloned generic.StringSet) error {
 	return nil
 }
 
-func editPkgbuilds(bases []Base, srcinfos map[string]*gosrc.Srcinfo) error {
+func editPkgbuilds(bases []dep.Base, srcinfos map[string]*gosrc.Srcinfo) error {
 	pkgbuilds := make([]string, 0, len(bases))
 	for _, base := range bases {
 		pkg := base.Pkgbase()
@@ -758,7 +760,7 @@ func editPkgbuilds(bases []Base, srcinfos map[string]*gosrc.Srcinfo) error {
 	return nil
 }
 
-func parseSrcinfoFiles(bases []Base, errIsFatal bool) (map[string]*gosrc.Srcinfo, error) {
+func parseSrcinfoFiles(bases []dep.Base, errIsFatal bool) (map[string]*gosrc.Srcinfo, error) {
 	srcinfos := make(map[string]*gosrc.Srcinfo)
 	for k, base := range bases {
 		pkg := base.Pkgbase()
@@ -782,7 +784,7 @@ func parseSrcinfoFiles(bases []Base, errIsFatal bool) (map[string]*gosrc.Srcinfo
 	return srcinfos, nil
 }
 
-func pkgbuildsToSkip(bases []Base, targets generic.StringSet) generic.StringSet {
+func pkgbuildsToSkip(bases []dep.Base, targets generic.StringSet) generic.StringSet {
 	toSkip := make(generic.StringSet)
 
 	for _, base := range bases {
@@ -808,7 +810,7 @@ func pkgbuildsToSkip(bases []Base, targets generic.StringSet) generic.StringSet 
 	return toSkip
 }
 
-func mergePkgbuilds(bases []Base) error {
+func mergePkgbuilds(bases []dep.Base) error {
 	for _, base := range bases {
 		if shouldUseGit(filepath.Join(config.BuildDir, base.Pkgbase())) {
 			err := gitMerge(config.BuildDir, base.Pkgbase())
@@ -821,14 +823,14 @@ func mergePkgbuilds(bases []Base) error {
 	return nil
 }
 
-func downloadPkgbuilds(bases []Base, toSkip generic.StringSet, buildDir string) (generic.StringSet, error) {
+func downloadPkgbuilds(bases []dep.Base, toSkip generic.StringSet, buildDir string) (generic.StringSet, error) {
 	cloned := make(generic.StringSet)
 	downloaded := 0
 	var wg sync.WaitGroup
 	var mux sync.Mutex
 	var errs generic.MultiError
 
-	download := func(k int, base Base) {
+	download := func(k int, base dep.Base) {
 		defer wg.Done()
 		pkg := base.Pkgbase()
 
@@ -882,7 +884,7 @@ func downloadPkgbuilds(bases []Base, toSkip generic.StringSet, buildDir string) 
 	return cloned, errs.Return()
 }
 
-func downloadPkgbuildsSources(bases []Base, incompatible generic.StringSet) (err error) {
+func downloadPkgbuildsSources(bases []dep.Base, incompatible generic.StringSet) (err error) {
 	for _, base := range bases {
 		pkg := base.Pkgbase()
 		dir := filepath.Join(config.BuildDir, pkg)

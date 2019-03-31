@@ -3,38 +3,21 @@ package main
 import (
 	"fmt"
 
+	"github.com/Jguer/yay/v9/dep"
 	"github.com/Jguer/yay/v9/generic"
 	alpm "github.com/jguer/go-alpm"
 	rpc "github.com/mikkeloscar/aur"
 )
 
-// Base represents a RPC package slice
-type Base []*rpc.Pkg
-
-// Pkgbase returns the PackageBase of the first package
-func (b Base) Pkgbase() string {
-	return b[0].PackageBase
-}
-
-// Version returns the Version of the first package
-func (b Base) Version() string {
-	return b[0].Version
-}
-
-// URLPath returns the URLPath of the first package
-func (b Base) URLPath() string {
-	return b[0].URLPath
-}
-
 type depOrder struct {
-	Aur     []Base
+	Aur     []dep.Base
 	Repo    []*alpm.Package
 	Runtime generic.StringSet
 }
 
 func makeDepOrder() *depOrder {
 	return &depOrder{
-		make([]Base, 0),
+		make([]dep.Base, 0),
 		make([]*alpm.Package, 0),
 		make(generic.StringSet),
 	}
@@ -113,7 +96,7 @@ func (do *depOrder) orderPkgAur(pkg *rpc.Pkg, dp *depPool, runtime bool) {
 		}
 	}
 
-	do.Aur = append(do.Aur, Base{pkg})
+	do.Aur = append(do.Aur, dep.Base{pkg})
 }
 
 func (do *depOrder) orderPkgRepo(pkg *alpm.Package, dp *depPool, runtime bool) {

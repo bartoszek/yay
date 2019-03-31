@@ -264,35 +264,6 @@ func editor() (string, []string) {
 	}
 }
 
-// ContinueTask prompts if user wants to continue task.
-//If NoConfirm is set the action will continue without user input.
-func continueTask(s string, cont bool) bool {
-	if config.NoConfirm {
-		return cont
-	}
-
-	var response string
-	var postFix string
-	yes := "yes"
-	no := "no"
-	y := string([]rune(yes)[0])
-	n := string([]rune(no)[0])
-
-	if cont {
-		postFix = fmt.Sprintf(" [%s/%s] ", strings.ToUpper(y), n)
-	} else {
-		postFix = fmt.Sprintf(" [%s/%s] ", y, strings.ToUpper(n))
-	}
-
-	fmt.Print(generic.Bold(generic.Green(generic.Arrow)+" "+s), generic.Bold(postFix))
-
-	if _, err := fmt.Scanln(&response); err != nil {
-		return cont
-	}
-
-	response = strings.ToLower(response)
-	return response == yes || response == y
-}
 
 func getInput(defaultValue string) (string, error) {
 	if defaultValue != "" || config.NoConfirm {

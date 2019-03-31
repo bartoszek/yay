@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Jguer/yay/v9/dep"
 	"github.com/Jguer/yay/v9/generic"
 
 	alpm "github.com/jguer/go-alpm"
@@ -151,13 +152,13 @@ func splitDBFromName(pkg string) (string, string) {
 	return "", split[0]
 }
 
-func getBases(pkgs []*rpc.Pkg) []Base {
-	basesMap := make(map[string]Base)
+func getBases(pkgs []*rpc.Pkg) []dep.Base {
+	basesMap := make(map[string]dep.Base)
 	for _, pkg := range pkgs {
 		basesMap[pkg.PackageBase] = append(basesMap[pkg.PackageBase], pkg)
 	}
 
-	bases := make([]Base, 0, len(basesMap))
+	bases := make([]dep.Base, 0, len(basesMap))
 	for _, base := range basesMap {
 		bases = append(bases, base)
 	}
